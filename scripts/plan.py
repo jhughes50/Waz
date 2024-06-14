@@ -1,9 +1,16 @@
 """
     Author: Jason Hughes
-    Data: June 2024
-    About: A brief hardcoded paht planner using semantics 
-    and relative depth.
+    Date:   June 2024
+    About:  A brief hardcoded path planner using semantics 
+            and relative depth.
 """
+import PIL
+import numpy as np
+from typing import List, Tuple, Dict
+
+from bfs import BinaryBreadthFirstSearch
+from semantics import SemanticMappings
+from cost_map import SemanticCostMap
 
 class ManetPlanner:
 
@@ -13,8 +20,14 @@ class ManetPlanner:
             we'll use this to inform where we are in the image
         """
         self.height_ = h
-        self.width_ = w
-        self.start_ = (w//2, 0)
+        self.width_  = w
+        self.start_  = (w//2, 0)
+
+        self.destination_ = None
+
+    @destination.setter
+    def destination(self, dest: tuple):
+        self.destination_ = dest
 
     def cancel_condition(self, d):
         if d[0] < 0 or d[0] > self.width_:
@@ -24,17 +37,12 @@ class ManetPlanner:
         else:
             return True
 
-    def semantic_planner(self, img, seg):
-        dot = self.start_
-
-        while cancel_condition(dot):
+    def semantic_planner(self, img: PIL.Image, seg: PIL.Image):
+        cost_map = SemanticCostMap(np.array(seg))        
             
 
-
-    def depth_planner(self, img, dep):
+    def depth_planner(self, img: PIL.Image, dep: PIL.Image):
         pass
 
-    def semantic_depth_planner(self, img, seg, dep):
+    def semantic_depth_planner(self, img: PIL.Image, seg: PIL.Image, dep: PIL.Image):
         pass
-
-
