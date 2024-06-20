@@ -35,7 +35,9 @@ RUN source /opt/conda/etc/profile.d/conda.sh \
  && conda create -n manet -y python=3.9 cmake=3.14.0 \
  && conda activate manet \
  && conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia -y \
- && conda install conda-forge::transformers -y\
+ && conda install conda-forge::transformers -y \
+ && conda install anaconda::numpy -y \
+ && conda install conda-forge::matplotlib -y \
  && conda install anaconda::jupyter -y \
  && conda install anaconda::notebook -y \
  && pip3 install --upgrade notebook

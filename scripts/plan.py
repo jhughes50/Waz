@@ -21,7 +21,7 @@ class ManetPlanner:
         """
         self.height_ = h
         self.width_  = w
-        self.start_  = (w//2, 0)
+        self.start_  = (w//2, h)
 
         self.destination_ = None
 
@@ -38,8 +38,10 @@ class ManetPlanner:
             return True
 
     def semantic_planner(self, img: PIL.Image, seg: PIL.Image):
-        cost_map = SemanticCostMap(np.array(seg))        
-            
+        cost_map = SemanticCostMap(np.array(seg))
+        start = Pair(self.start_[0], self.start_[1])
+        end = Pair(self.destination_[0], self.destination_[1])
+        
 
     def depth_planner(self, img: PIL.Image, dep: PIL.Image):
         pass
