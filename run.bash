@@ -11,5 +11,6 @@ docker run --rm -it --gpus '"device=0"' \
     -v "./notebooks:/home/jasonah/notebooks" \
     -v "./scripts:/home/jasonah/scripts" \
     -v "/pool/jasonah/WestPoint:/home/jasonah/data" \
+    -v "/pool/jasonah/Manet/depth-anything/checkpoints/:/home/jasonah/models/Depth-Anything-V2/depth_anything_v2/checkpoints" \
     manet-doc \
     bash
