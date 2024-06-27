@@ -55,6 +55,7 @@ RUN sudo apt-get update \
  libgoogle-glog-dev \
  libopencv-dev \
  libtbb-dev \
- libtorch-dev
+ libtorch-dev \
+ libyaml-dev
 
 WORKDIR /home/jason
