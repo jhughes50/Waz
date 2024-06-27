@@ -10,20 +10,24 @@
 #define NETWORK_MANAGER_HPP
 
 #include <string>
+#include <iostream>
+#include <fstream>
+
 #include <opencv2/opencv.hpp>
 #include <torch/script.h>
 #include <json/json.h>
 #include <glog/logging.h>
+
+#include "params.hpp"
 
 class NetworkManager
 {
     public:
         NetworkManager(std::string params_path);
 
-        struct Params
-        {
+        struct NetworkParams : Params(params_path + "/network_manager.json")
+        {    
             std::string model_path;
-            void load(std::string params_path);
         };
 
     protected:
@@ -31,6 +35,10 @@ class NetworkManager
         void inference(cv::Mat img);
 
     private:
+        void setParams();
+
         torch::jit::script::Module module_;
+        NetworkParams params_;
+        std::string model_id_;
 };
 #endif
