@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.1.0-base-ubuntu22.04
+FROM nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu20.04 
 
 RUN apt-get update \
  && export TZ="America/New_York" \
@@ -29,7 +29,19 @@ RUN apt-get update \
  build-essential \
  sudo \
  wget \
- curl
+ curl \
+ zip \
+ unzip
+
+# install libtorch 
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-keyring_1.0-1_all.deb \
+ && dpkg -i cuda-keyring_1.0-1_all.deb \
+ && apt-get update \
+ && apt-get -y install cuda
+RUN wget https://download.pytorch.org/libtorch/cu121/libtorch-cxx11-abi-shared-with-deps-2.3.1%2Bcu121.zip \
+ && unzip *.zip \
+ && mv libtorch/ /opt \
+ && rm *.zip
 
 # add a user
 ARG user_id=1000
@@ -55,7 +67,11 @@ RUN sudo apt-get update \
  libgoogle-glog-dev \
  libopencv-dev \
  libtbb-dev \
- libtorch-dev \
- libyaml-dev
+ libjsoncpp-dev
 
 WORKDIR /home/jason
+
+RUN mkdir include/ src/ cmake/ build/
+RUN touch CMakeLists.txt
+
+ENV CUDA_HOME=/usr/local/cuda
