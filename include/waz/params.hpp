@@ -14,7 +14,7 @@
 
 struct Params
 {
-    Params(std::string path);
+    explicit Params(std::string path);
     Json::Value params_map_;
 };
 #endif

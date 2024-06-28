@@ -2,9 +2,14 @@
     "depth":
     {
         "path": "home/jason/models/model.pt"
-    }
+    },
     "semantics":
     {
         "path": "/home/json/models/models/pt"
+    },
+    "torch":
+    {
+        "device": "cuda",
+        "channels": 3
     }
 }

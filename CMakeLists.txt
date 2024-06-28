@@ -27,4 +27,5 @@ include_directories(
 
 add_library(${PROJECT_NAME}
     src/network_manager.cpp
+    src/params.cpp
 )

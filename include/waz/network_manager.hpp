@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #include <opencv2/opencv.hpp>
 #include <torch/script.h>
@@ -23,22 +24,35 @@
 class NetworkManager
 {
     public:
-        NetworkManager(std::string params_path);
+        NetworkManager(std::string params_path, std::string model_id);
 
-        struct NetworkParams : Params(params_path + "/network_manager.json")
+        struct NetworkParams : public Params
         {    
+            using Params::Params;
+            
             std::string model_path;
+            std::string device;
+            int channels;
+
+            void setParams(std::string model_id) noexcept;
         };
 
     protected:
-        void load(std::string path);
-        void inference(cv::Mat img);
+        // Class functions to be inherited
+        void load(const std::string path) noexcept;
+        void inference(const cv::Mat img) noexcept;
 
     private:
-        void setParams();
-
+        // Class varaibles
+        // Torch variables
         torch::jit::script::Module module_;
+
+        // Parameter varaibles
         NetworkParams params_;
         std::string model_id_;
+
+        // Private class functions 
+        at::Tensor cvToTensor(const cv::Mat& img, bool unsqueeze=false, uint8_t unsqueeze_dim=0) const noexcept;
+
 };
 #endif
