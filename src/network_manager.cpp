@@ -13,6 +13,7 @@ NetworkManager::NetworkManager(std::string params_path, std::string model_id) : 
     model_id_ = model_id;
     params_.setParams(model_id);
     //device_ = at::kCUDA;
+    load(params_.model_path);
 }
 
 void NetworkManager::load(const std::string model_path) noexcept
@@ -20,18 +21,23 @@ void NetworkManager::load(const std::string model_path) noexcept
     try
     {
         module_ = torch::jit::load(model_path, at::kCUDA);
+        module_.eval();
     }
     catch (const c10::Error &e)
     {
-       LOG(FATAL) << "Model at " << model_path << " was not found, exiting.";      
+       LOG(FATAL) << "Model at " << model_path << " was not found because " << e.what() <<", exiting.";      
     }
     LOG(INFO) << "Model loaded succesfully at " << model_path;
 }
 
-void NetworkManager::inference(const cv::Mat img) noexcept
+at::Tensor NetworkManager::forward(const at::Tensor img) noexcept
 {
     std::vector<torch::jit::IValue> input;
-    //input.push_back(
+    input.push_back(img);
+
+    at::Tensor output = module_.forward(input).toTensor();
+
+    return output;
 }
 
 at::Tensor NetworkManager::cvToTensor(const cv::Mat& img, bool unsqueeze, uint8_t unsqueeze_dim) const noexcept

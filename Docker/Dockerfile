@@ -69,9 +69,14 @@ RUN sudo apt-get update \
  libtbb-dev \
  libjsoncpp-dev
 
+#install torch for debugging 
+RUN sudo apt-get install -y python3-pip
+RUN pip3 install torch torchvision torchaudio
+RUN pip3 install opencv-python
 WORKDIR /home/jason
 
-RUN mkdir include/ src/ cmake/ build/
+RUN mkdir include/ src/ cmake/ build/ test/ config/ models/
+
 RUN touch CMakeLists.txt
 
 ENV CUDA_HOME=/usr/local/cuda

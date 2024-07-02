@@ -40,7 +40,7 @@ class NetworkManager
     protected:
         // Class functions to be inherited
         void load(const std::string path) noexcept;
-        void inference(const cv::Mat img) noexcept;
+        at::Tensor forward(const cv::Mat img) noexcept;
 
     private:
         // Class varaibles

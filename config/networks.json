@@ -1,11 +1,11 @@
 {
     "depth":
     {
-        "path": "home/jason/models/model.pt"
+        "path": "/home/jason/models/depth_anything_v2_vitb_traced.pt"
     },
     "semantics":
     {
-        "path": "/home/json/models/models/pt"
+        "path": "/home/json/models/models/segformer.b5.1024x1024.city.160k.pth"
     },
     "torch":
     {

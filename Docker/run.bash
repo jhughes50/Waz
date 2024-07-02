@@ -7,6 +7,9 @@ docker run --rm -it \
     -v `pwd`/../include:/home/jason/include \
     -v `pwd`/../src:/home/jason/src \
     -v `pwd`/../cmake:/home/jason/cmake \
+    -v `pwd`/../test:/home/jason/test \
+    -v `pwd`/../config:/home/jason/config \
+    -v `pwd`/../models:/home/jason/models \
     --gpus all \
     -e "TERM=xterm-256color" \
     -e DISPLAY=$DISPLAY \

@@ -11,12 +11,32 @@
 #ifndef DEPTH_HPP
 #define DEPTH_HPP
 
-class DepthModeling
+#include <string>
+#include <opencv2/core/hpp>
+#include <torch/script.h>
+
+#include "network_manager.hpp"
+#include "params.hpp"
+
+class DepthModeling : protected NetworkManager
 {
     public:
-        struct Params
-        {
-                    
+        DepthModeling(std::string params_path, std::string model_id = "depth");
+
+        struct DepthParams: public Params
+        {   
+            using Params::Params;
+
+            int patch;
+            int channels;
+
+            void setParams();
         };
+
+    private:
+        at::Tensor cvToTensor(const cv::Mat& mat, bool unsqueeze=false, uint8_t unsqueeze_dim=0) const noexcept;
+        cv::Mat tensorToCv(const at::Tensor& tensor) const noexcept;
+
+        DepthParams params_;
 };
 #endif

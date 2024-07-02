@@ -4,3 +4,5 @@ Docker/.bash_history
 *.pth
 
 build/
+models/*.pt
+models/*.pth

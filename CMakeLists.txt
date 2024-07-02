@@ -29,3 +29,13 @@ add_library(${PROJECT_NAME}
     src/network_manager.cpp
     src/params.cpp
 )
+
+add_executable(model-test test/models.cpp)
+target_link_libraries(model-test
+    ${PROJECT_NAME}
+    ${TORCH_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    jsoncpp_lib
+    ${glog_LIBRARIES}
+    )
+set_property(TARGET model-test PROPERTY CXX_STANDARD 17)
