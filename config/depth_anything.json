@@ -1,0 +1,8 @@
+{
+    "depth":
+    {
+        "device": "cuda",
+        "encoder": "vitb",
+        "path": "/home/jason/models/depth_anything_v2_vitb.pth"
+    }
+}

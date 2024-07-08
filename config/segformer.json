@@ -1,0 +1,8 @@
+{
+    "segformer":
+    {
+        "device": "cuda",
+        "config": "/home/jason/models/SegFormer/local_configs/segformer/B5/segformer.b5.1024x1024.city.160k.py",
+        "path": "/home/jason/models/segformer.b5.1024x1024.city.160k.pth"
+    }
+}

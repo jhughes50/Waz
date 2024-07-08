@@ -2,6 +2,7 @@ Docker/.bash_history
 .bash_history
 *.pt
 *.pth
+*.pyc
 
 build/
 models/*.pt
