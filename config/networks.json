@@ -1,7 +1,8 @@
 {
     "depth":
     {
-        "path": "/home/jason/models/depth_anything_v2_vitb_traced.pt"
+        "path": "/home/jason/models/depth_anything_v2_vitb_traced.pt",
+        "patch": 14
     },
     "semantics":
     {
