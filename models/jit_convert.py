@@ -41,8 +41,8 @@ def convert(model_id):
         torch.jit.save(traced_model, "depth_anything_v2_vitb_traced.pt")
         print("Saved traced depth model")
         
-        #script_model = torch.jit.script(model)
-        #torch.jit.save(script_mode, "depth_anything_v2_vitb_scripted.pt")
+        script_model = torch.jit.script(model)
+        torch.jit.save(script_mode, "depth_anything_v2_vitb_scripted.pt")
 
     elif model_id == "segment":
         print("converting segformer model")
