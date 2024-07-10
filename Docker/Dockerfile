@@ -60,6 +60,7 @@ ENV LANGUAGE en_US:en
 
 USER $USER
 COPY .bashrc .
+
 # install Waz depends
 RUN sudo apt-get update \
  && sudo apt-get install -y --no-install-recommends \
@@ -77,7 +78,15 @@ WORKDIR /home/jason
 
 RUN pip3 install transformers
 
-RUN mkdir include/ src/ cmake/ build/ test/ config/ models/ utils/
+# install test dependencies
+RUN pip3 install matplotlib
+RUN sudo apt-get install -y libgtest-dev \
+ && cd /usr/src/gtest \
+ && sudo cmake CMakeLists.txt\
+ && sudo make \
+ && sudo cp lib/*.a /usr/lib
+
+RUN mkdir include/ src/ cmake/ build/ test/ config/ models/ utils/ .waz/
 
 RUN touch CMakeLists.txt
 

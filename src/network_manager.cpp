@@ -10,7 +10,7 @@
 NetworkManager::NetworkManager(std::string params_path, std::string model_id) : params_(params_path)
 {
     // have the constructor load the params json and set them 
-    google::InitGoogleLogging(".waz/");
+    google::InitGoogleLogging("/home/jason/.waz/");
     model_id_ = model_id;
     params_.setParams(model_id);
     //device_ = at::kCUDA;
@@ -36,8 +36,8 @@ at::Tensor NetworkManager::forward(const at::Tensor img) noexcept
     std::vector<torch::jit::IValue> input;
     input.push_back(img);
 
-    at::Tensor output = module_.forward(input).toTensor();
-
+    //at::Tensor output = module_.forward(input).toTensor();
+    at::Tensor output = module_.forward(input).toTuple()->elements()[0].toTensor();
     return output;
 }
 

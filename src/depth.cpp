@@ -9,12 +9,12 @@
 #include "waz/depth.hpp"
 #include "waz/resize.hpp"
 
-DepthModeling::DepthModeling(std::string params_path, std::string model_id) : NetworkManager(params_path, model_id), params_(params_path)
+DepthManager::DepthManager(std::string params_path, std::string model_id) : NetworkManager(params_path, model_id), params_(params_path)
 {
     params_.setParams();
 }
 
-void DepthModeling::normalizeImage(cv::Mat& img)
+void DepthManager::normalizeImage(cv::Mat& img)
 {
     // convert from BGR to RGB
     cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
@@ -28,13 +28,13 @@ void DepthModeling::normalizeImage(cv::Mat& img)
     cv::divide(img, std_values, img);
 }
 
-void DepthModeling::resizeImage(cv::Mat& img)
+void DepthManager::resizeImage(cv::Mat& img)
 {
     Resize resize(params_.input_width, params_.input_height, true, params_.patch);
     resize(img);
 }
 
-at::Tensor DepthModeling::cvToTensor(const cv::Mat& mat, bool unsqueeze, uint8_t unsqueeze_dim) const noexcept
+at::Tensor DepthManager::cvToTensor(const cv::Mat& mat, bool unsqueeze, uint8_t unsqueeze_dim) const noexcept
 {
     // make sure the image is continuous in mem
     cv::Mat c_img = mat.isContinuous() ? mat : mat.clone();
@@ -48,30 +48,38 @@ at::Tensor DepthModeling::cvToTensor(const cv::Mat& mat, bool unsqueeze, uint8_t
     {
         tensor_img.unsqueeze_(unsqueeze_dim);
     }
-    std::cout << tensor_img.sizes()[0] << " " << tensor_img.sizes()[1] << " " << tensor_img.sizes()[2] << " " << tensor_img.sizes()[3] << std::endl;
+    //std::cout << tensor_img.sizes()[0] << " " << tensor_img.sizes()[1] << " " << tensor_img.sizes()[2] << " " << tensor_img.sizes()[3] << std::endl;
     tensor_img = tensor_img.to(at::kCUDA);
     
     return tensor_img;
 }
 
-cv::Mat DepthModeling::tensorToCv(const at::Tensor& tensor) const noexcept
+cv::Mat DepthManager::tensorToCv(at::Tensor& tensor) const noexcept
 {
+    tensor = tensor.contiguous();
+    //tensor = tensor.to(torch::kFloat32);
+    //tensor = tensor.mul(255).clamp(0,255);
+    //tensor = tensor.to(torch::kUInt8);
 
+    cv::Mat img(tensor.size(1), tensor.size(2), CV_8UC1, tensor.data_ptr());
+
+    return img;
 }
 
-at::Tensor DepthModeling::inference(cv::Mat& img)
+cv::Mat DepthManager::inference(cv::Mat& img)
 {
     at::Tensor input, result;
     normalizeImage(img);
     resizeImage(img);
     input = cvToTensor(img, true, 0);
 
-    result = forward(input);
+    result = forward(input).to(at::kCPU);
+    cv::Mat result_img = tensorToCv(result);
 
-    return result;
+    return result_img;
 }
 
-void DepthModeling::DepthParams::setParams() noexcept
+void DepthManager::DepthParams::setParams() noexcept
 {
     patch = params_map_["depth"]["patch"].asInt();
     channels = params_map_["torch"]["channels"].asInt();

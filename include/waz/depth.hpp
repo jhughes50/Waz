@@ -13,15 +13,16 @@
 
 #include <string>
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <torch/script.h>
 
 #include "network_manager.hpp"
 #include "params.hpp"
 
-class DepthModeling : protected NetworkManager
+class DepthManager : protected NetworkManager
 {
     public:
-        DepthModeling(std::string params_path, std::string model_id = "depth");
+        DepthManager(std::string params_path, std::string model_id = "depth");
 
         struct DepthParams: public Params
         {   
@@ -39,11 +40,13 @@ class DepthModeling : protected NetworkManager
             void setParams() noexcept;
         };
 
-        at::Tensor inference(cv::Mat& img);
+        cv::Mat inference(cv::Mat& img);
+
+        friend class DepthManagerTest;
 
     private:
         at::Tensor cvToTensor(const cv::Mat& mat, bool unsqueeze=false, uint8_t unsqueeze_dim=0) const noexcept;
-        cv::Mat tensorToCv(const at::Tensor& tensor) const noexcept;
+        cv::Mat tensorToCv(at::Tensor& tensor) const noexcept;
 
         void normalizeImage(cv::Mat& img);
         void resizeImage(cv::Mat& img);

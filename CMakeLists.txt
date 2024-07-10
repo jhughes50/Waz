@@ -16,6 +16,8 @@ find_package(TBB REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(glog 0.4.0 REQUIRED)
 find_package(jsoncpp REQUIRED)
+find_package(GTest REQUIRED)
+find_package(Threads REQUIRED)
 
 include_directories(
     include
@@ -23,6 +25,7 @@ include_directories(
     ${Torch_INCLUDE_DIRS}
     ${Json_INCLUDE_DIRS}
     ${glog_INCLUDE_DIRS}
+    ${GTEST_INCLUDE_DIRS}
 )
 
 add_library(${PROJECT_NAME}
@@ -39,5 +42,7 @@ target_link_libraries(model-test
     ${OpenCV_LIBRARIES}
     jsoncpp_lib
     ${glog_LIBRARIES}
+    ${GTEST_LIBRARIES}
+    pthread
     )
 set_property(TARGET model-test PROPERTY CXX_STANDARD 17)
