@@ -4,3 +4,9 @@
 [submodule "models/SegFormer"]
 	path = models/SegFormer
 	url = https://github.com/NVlabs/SegFormer
+[submodule "models/transformers"]
+	path = models/transformers
+	url = https://github.com/huggingface/transformers
+[submodule "dinov2"]
+	path = dinov2
+	url = https://github.com/facebookresearch/dinov2

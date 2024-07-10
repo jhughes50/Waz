@@ -24,6 +24,7 @@
 class NetworkManager
 {
     public:
+        //NetworkManager();
         NetworkManager(std::string params_path, std::string model_id);
 
         struct NetworkParams : public Params
@@ -40,7 +41,7 @@ class NetworkManager
     protected:
         // Class functions to be inherited
         void load(const std::string path) noexcept;
-        at::Tensor forward(const cv::Mat img) noexcept;
+        at::Tensor forward(const at::Tensor img) noexcept;
 
     private:
         // Class varaibles
@@ -55,4 +56,4 @@ class NetworkManager
         at::Tensor cvToTensor(const cv::Mat& img, bool unsqueeze=false, uint8_t unsqueeze_dim=0) const noexcept;
 
 };
-#endif
+#endif 

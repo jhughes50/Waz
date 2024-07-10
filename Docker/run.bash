@@ -10,6 +10,7 @@ docker run --rm -it \
     -v `pwd`/../test:/home/jason/test \
     -v `pwd`/../config:/home/jason/config \
     -v `pwd`/../models:/home/jason/models \
+    -v `pwd`/../utils:/home/jason/utils \
     --gpus all \
     -e "TERM=xterm-256color" \
     -e DISPLAY=$DISPLAY \

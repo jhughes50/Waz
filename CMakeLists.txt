@@ -28,6 +28,8 @@ include_directories(
 add_library(${PROJECT_NAME}
     src/network_manager.cpp
     src/params.cpp
+    src/depth.cpp
+    utils/resize.cpp
 )
 
 add_executable(model-test test/models.cpp)

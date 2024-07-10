@@ -8,15 +8,17 @@
 #include <string>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <torch/script.h>
 
 #include "waz/network_manager.hpp"
+#include "waz/depth.hpp"
 
 int main()
 {
 
     std::cout << "[MODEL-TEST] Initializing Depth Manager" << std::endl;
-    NetworkManager manager("/home/jason/config/networks.json","depth");
-    std::cout << "[MODEL_TEST] Depth Manager Initialized" << std::endl;
+
+    DepthModeling dpa("/home/jason/config/networks.json", "depth");
 
     cv::Mat test_img = cv::imread("/home/jason/test/test-img.png", cv::IMREAD_COLOR);
     if (test_img.empty())
@@ -28,8 +30,9 @@ int main()
     {
         std::cout << "[MODEL-TEST] Loaded test image" << std::endl;
     }
-   
-    cv::Mat output = manager.inference(test_img);
+    at::Tensor result;
+    result = dpa.inference(test_img);
+    std::cout << "dimensions: " << result.ndimension() << std::endl;
 
     return 0;
 }

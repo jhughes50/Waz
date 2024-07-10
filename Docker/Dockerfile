@@ -75,7 +75,9 @@ RUN pip3 install torch torchvision torchaudio
 RUN pip3 install opencv-python
 WORKDIR /home/jason
 
-RUN mkdir include/ src/ cmake/ build/ test/ config/ models/
+RUN pip3 install transformers
+
+RUN mkdir include/ src/ cmake/ build/ test/ config/ models/ utils/
 
 RUN touch CMakeLists.txt
 

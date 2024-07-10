@@ -1,12 +1,20 @@
 {
     "depth":
     {
-        "path": "/home/jason/models/depth_anything_v2_vitb_traced.pt",
-        "patch": 14
+        "path": "/home/jason/models/depth-anything-v2-base-traced.pt",
+        "patch": 14,
+        "mean_r": 0.485,
+        "mean_g": 0.456,
+        "mean_b": 0.406,
+        "std_r": 0.229,
+        "std_g": 0.224,
+        "std_b": 0.225,
+        "input_height": 518,
+        "input_width": 518
     },
     "semantics":
     {
-        "path": "/home/json/models/models/segformer.b5.1024x1024.city.160k.pth"
+        "path": "/home/json/models/models/segformer-b5-cityscapes-1024-traced.pt"
     },
     "torch":
     {
