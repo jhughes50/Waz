@@ -45,7 +45,6 @@ class DepthManager : protected NetworkManager
         friend class DepthManagerTest;
 
     private:
-        at::Tensor cvToTensor(const cv::Mat& mat, bool unsqueeze=false, uint8_t unsqueeze_dim=0) const noexcept;
         cv::Mat tensorToCv(at::Tensor& tensor) const noexcept;
 
         void normalizeImage(cv::Mat& img);

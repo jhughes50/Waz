@@ -60,14 +60,14 @@ def convert(model_id):
     elif model_id == "segment":
         print("[JIT-CONVERT] Converting segformer model...")
 
-        feature_extractor = SegformerImageProcessor.from_pretrained("nvidia/segformer-b5-finetuned-cityscapes-1024-1024")
-        model = SegformerForSemanticSegmentation.from_pretrained("nvidia/segformer-b5-finetuned-cityscapes-1024-1024", torchscript=True)
+        feature_extractor = SegformerImageProcessor.from_pretrained("nvidia/segformer-b1-finetuned-cityscapes-1024-1024")
+        model = SegformerForSemanticSegmentation.from_pretrained("nvidia/segformer-b1-finetuned-cityscapes-1024-1024", torchscript=True)
         model.eval()
 
         inputs = feature_extractor(images=trace_img, return_tensors="pt")
         #print(inputs)
         traced_model = torch.jit.trace(model, inputs['pixel_values'])
-        f_name = "segformer-b5-cityscapes-1024-traced.pt"
+        f_name = "segformer-b1-cityscapes-1024-traced.pt"
         torch.jit.save(traced_model, f_name)
 
         print("[JIT-CONVERT] Converted and saved traced file: %s" %f_name)

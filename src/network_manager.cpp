@@ -41,16 +41,22 @@ at::Tensor NetworkManager::forward(const at::Tensor img) noexcept
     return output;
 }
 
-at::Tensor NetworkManager::cvToTensor(const cv::Mat& img, bool unsqueeze, uint8_t unsqueeze_dim) const noexcept
+at::Tensor NetworkManager::cvToTensor(const cv::Mat& mat, bool unsqueeze, uint8_t unsqueeze_dim) const noexcept
 {
-    auto options = at::TensorOptions().device(at::kCUDA,1).requires_grad(false);
-    at::Tensor tensor_img = torch::from_blob(img.data, { img.rows, img.cols, params_.channels }, options);
+    // make sure the image is continuous in mem
+    cv::Mat c_img = mat.isContinuous() ? mat : mat.clone();
 
+    auto options = at::TensorOptions().device(at::kCUDA, 1).requires_grad(false);
+    at::Tensor tensor_img = torch::from_blob(c_img.data, {c_img.rows, c_img.cols, params_.channels});//, options);
+    
+    tensor_img = tensor_img.permute({2, 0, 1});
+    tensor_img = tensor_img.to(torch::kFloat32);
     if (unsqueeze)
     {
         tensor_img.unsqueeze_(unsqueeze_dim);
     }
-
+    tensor_img = tensor_img.to(at::kCUDA);
+    
     return tensor_img;
 }
 

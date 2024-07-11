@@ -24,7 +24,10 @@ class Normalize
         cv::Scalar std_;
     
     public:
-        Normalize(const int mean[SIZE], const int std[SIZE]);
+        Normalize(const float mean[SIZE], const float std[SIZE]);
+        Normalize() = default;
+
         void operator()(cv::Mat& img);
+        void operator()(cv::Mat& img, const float mean[SIZE], const float std[SIZE]);
 };
 #endif

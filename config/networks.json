@@ -14,7 +14,7 @@
     },
     "semantics":
     {
-        "path": "/home/json/models/models/segformer-b5-cityscapes-1024-traced.pt",
+        "path": "/home/jason/models/segformer-b1-cityscapes-1024-traced.pt",
         "mean_r": 123.675,
         "mean_g": 116.28,
         "mean_b": 103.53,

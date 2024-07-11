@@ -42,6 +42,7 @@ class NetworkManager
         // Class functions to be inherited
         void load(const std::string path) noexcept;
         at::Tensor forward(const at::Tensor img) noexcept;
+        at::Tensor cvToTensor(const cv::Mat& mat, bool unsqueeze=false, uint8_t unsqueeze_dim=0) const noexcept;
 
     private:
         // Class varaibles
@@ -51,9 +52,5 @@ class NetworkManager
         // Parameter varaibles
         NetworkParams params_;
         std::string model_id_;
-
-        // Private class functions 
-        at::Tensor cvToTensor(const cv::Mat& img, bool unsqueeze=false, uint8_t unsqueeze_dim=0) const noexcept;
-
 };
 #endif 

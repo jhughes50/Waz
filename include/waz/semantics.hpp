@@ -13,15 +13,21 @@
 #include <string>
 #include <opencv2/core.hpp>
 #include <torch/script.h>
+#include <Eigen/Dense>
 
 #include "network_manager.hpp"
 #include "params.hpp"
+#include "resize.hpp"
+#include "normalize.hpp"
+
 
 class SemanticsManager : protected NetworkManager
 {
     public:
 
         SemanticsManager(std::string path, std::string model_id = "semantics");
+        //Eigen::MatrixXf inference(cv::Mat& img);
+        at::Tensor inference(cv::Mat& img);
 
         struct SemanticParams : public Params
         {
@@ -35,6 +41,10 @@ class SemanticsManager : protected NetworkManager
             
             int input_height, input_width;
 
+            static const int SIZE = 3;
+            float mean[SIZE];
+            float std[SIZE];
+
             void setParams() noexcept;
         };
 
@@ -42,8 +52,10 @@ class SemanticsManager : protected NetworkManager
 
     private:
 
-        at::Tensor cvToTensor(const cv::Mat& mat, bool unsqueeze = false, uint8_t unsqueeze_dim = 0);
+        Eigen::MatrixXf tensorToEigen(const at::Tensor& tensor) const noexcept;
         
         SemanticParams params_;
+        Resize resize_;
+        Normalize normalize_;
 };
 #endif

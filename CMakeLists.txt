@@ -18,6 +18,7 @@ find_package(glog 0.4.0 REQUIRED)
 find_package(jsoncpp REQUIRED)
 find_package(GTest REQUIRED)
 find_package(Threads REQUIRED)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 include_directories(
     include
@@ -26,18 +27,20 @@ include_directories(
     ${Json_INCLUDE_DIRS}
     ${glog_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIR}
 )
 
 add_library(${PROJECT_NAME}
     src/network_manager.cpp
     src/params.cpp
     src/depth.cpp
+    src/semantics.cpp
     utils/resize.cpp
     utils/normalize.cpp
 )
 
-add_executable(model-test test/models.cpp)
-target_link_libraries(model-test
+add_executable(semantics-test test/cpp/semantics_model.cpp)
+target_link_libraries(semantics-test
     ${PROJECT_NAME}
     ${TORCH_LIBRARIES}
     ${OpenCV_LIBRARIES}
@@ -45,5 +48,17 @@ target_link_libraries(model-test
     ${glog_LIBRARIES}
     ${GTEST_LIBRARIES}
     pthread
+    Eigen3::Eigen
     )
-set_property(TARGET model-test PROPERTY CXX_STANDARD 17)
+
+#add_executable(model-test test/models.cpp)
+#target_link_libraries(model-test
+#    ${PROJECT_NAME}
+#    ${TORCH_LIBRARIES}
+#    ${OpenCV_LIBRARIES}
+#    jsoncpp_lib
+#    ${glog_LIBRARIES}
+#    ${GTEST_LIBRARIES}
+#    pthread
+#    )
+#set_property(TARGET model-test PROPERTY CXX_STANDARD 17)
