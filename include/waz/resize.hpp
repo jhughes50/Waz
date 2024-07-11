@@ -18,7 +18,11 @@ class Resize
 {   
     public:
         Resize(int width, int height, bool resize_target = true, int multiple_of = 1);
+        Resize(int width, int height);
+        Resize() = default;
+
         void operator()(cv::Mat& img);
+        void operator()(cv::Mat& img, const int width, const int height);
 
     private:
         int width_;

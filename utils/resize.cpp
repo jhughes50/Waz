@@ -17,6 +17,12 @@ Resize::Resize(int width, int height, bool resize_target, int multiple_of)
     multiple_of_ = multiple_of;
 }
 
+Resize::Resize(int width, int height)
+{
+    width_ = width;
+    height_ = height;
+}
+
 int Resize::constrainToMultipleOf(const double x, const int min_val, const int max_val)
 {
     int y;
@@ -54,5 +60,12 @@ void Resize::operator()(cv::Mat& img)
 {
     cv::Size dims = getSize(img.cols, img.rows);
     
+    cv::resize(img, img, dims, cv::INTER_AREA);
+}
+
+void Resize::operator()(cv::Mat& img, const int width, const int height)
+{
+    cv::Size dims(width, height);
+
     cv::resize(img, img, dims, cv::INTER_AREA);
 }

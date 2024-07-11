@@ -33,6 +33,7 @@ add_library(${PROJECT_NAME}
     src/params.cpp
     src/depth.cpp
     utils/resize.cpp
+    utils/normalize.cpp
 )
 
 add_executable(model-test test/models.cpp)

@@ -14,7 +14,15 @@
     },
     "semantics":
     {
-        "path": "/home/json/models/models/segformer-b5-cityscapes-1024-traced.pt"
+        "path": "/home/json/models/models/segformer-b5-cityscapes-1024-traced.pt",
+        "mean_r": 123.675,
+        "mean_g": 116.28,
+        "mean_b": 103.53,
+        "std_r": 58.395,
+        "std_g": 57.12,
+        "std_b": 57.365,
+        "input_height": 1024,
+        "input_width": 1024
     },
     "torch":
     {
