@@ -22,7 +22,52 @@
         "std_g": 57.12,
         "std_b": 57.365,
         "input_height": 1024,
-        "input_width": 1024
+        "input_width": 1024,
+        "num_classes": 19,
+        "classes":
+        {
+            "0": "road",
+            "1": "sidewalk",
+            "2": "building",
+            "3": "wall",
+            "4": "fence",
+            "5": "pole",
+            "6": "traffic light",
+            "7": "traffic sign",
+            "8": "vegetation",
+            "9": "terrain",
+            "10": "sky",
+            "11": "person",
+            "12": "rider",
+            "13": "car",
+            "14": "truck",
+            "15": "bus",
+            "16": "train",
+            "17": "motorcycle",
+            "18": "bicycle"
+        },
+        "invclasses":
+        {
+            "bicycle": 18,
+            "building": 2,
+            "bus": 15,
+            "car": 13,
+            "fence": 4,
+            "motorcycle": 17,
+            "person": 11,
+            "pole": 5,
+            "rider": 12,
+            "road": 0,
+            "sidewalk": 1,
+            "sky": 10,
+            "terrain": 9,
+            "traffic light": 6,
+            "traffic sign": 7,
+            "train": 16,
+            "truck": 14,
+            "vegetation": 8,
+            "wall": 3
+        }
     },
     "torch":
     {

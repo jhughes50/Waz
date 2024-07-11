@@ -47,6 +47,12 @@ Eigen::MatrixXf SemanticsManager::tensorToEigen(const at::Tensor& tensor) const 
     return mat;
 }
 
+at::Tensor SemanticsManager::postProcess(at::Tensor& result)
+{
+    result.squeeze(0);
+    return torch::argmax(result, 0);
+}
+
 at::Tensor SemanticsManager::inference(cv::Mat& img)
 {   
     at::Tensor input, result;
@@ -56,7 +62,8 @@ at::Tensor SemanticsManager::inference(cv::Mat& img)
     input = cvToTensor(img, true, 0);
 
     result = forward(input).to(at::kCPU);
-    return result;
+    
+    return postProcess(result);
     //return tensorToEigen(result);
 }
 

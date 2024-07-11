@@ -16,17 +16,19 @@ from transformers import SegformerImageProcessor, SegformerForSemanticSegmentati
 transform = transforms.Compose([transforms.ToTensor()])
 
 def test(model_id):
-    trace_img = cv2.imread("test-img-1.png")
+    trace_img = cv2.imread("/home/jason/test/imgs/test-img-1.png")
 
     if model_id == "depth":
         print("Validating SegFormer model...\n")
         image_processor = SegformerImageProcessor.from_pretrained("nvidia/segformer-b5-finetuned-cityscapes-1024-1024")
         inputs = image_processor(images=trace_img, return_tensors="pt")
-       
+         
         inp = inputs["pixel_values"]
         inp = inp.squeeze().permute(1,2,0)
         np_array = inp.numpy()
         
+        plt.imshow(np_array)
+        plt.savefig("normalized.png")
         if np_array.dtype == np.float32 or np_array.dtype == np.float64:
             np_array = (np_array * 255).clip(0, 255).astype(np.uint8)
     
@@ -54,7 +56,9 @@ def test(model_id):
         hf_model = SegformerForSemanticSegmentation.from_pretrained("nvidia/segformer-b5-finetuned-cityscapes-1024-1024", torchscript=True)    
         hf_model.eval()
         
-        #output = hf_model(inputs["pixel_values"])
+        output = hf_model(inputs["pixel_values"])
+        print(output)
+        print(output.logits)
         #tensor = output[0].detach().squeeze(0)
         #np_array = tensor.numpy()
 

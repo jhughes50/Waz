@@ -24,14 +24,16 @@ void Normalize::operator()(cv::Mat& img)
 
 void Normalize::operator()(cv::Mat& img, const float mean[SIZE], const float std[SIZE])
 {
-    cv::Scalar mean_vals(mean[0], mean[1], mean[2]);
-    cv::Scalar std_vals(std[0], std[1], std[2]);
+    img.convertTo(img, CV_32F);
 
-    // convert from BGR to RGB
-    cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
-    img.convertTo(img, 5, 1.0/255.0);
+    std::vector<cv::Mat> channels;
+    cv::split(img, channels);
 
-    // divide by mean subtract std
-    cv::subtract(img, mean_, img);
-    cv::divide(img, std_, img);
+    for (int i =0; i < channels.size(); ++i)
+    {
+        channels[i] = (channels[i] - mean[i]) - std[i];
+    }
+
+    cv::merge(channels, img);
+    cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
 }

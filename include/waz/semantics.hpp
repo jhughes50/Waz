@@ -53,7 +53,8 @@ class SemanticsManager : protected NetworkManager
     private:
 
         Eigen::MatrixXf tensorToEigen(const at::Tensor& tensor) const noexcept;
-        
+        at::Tensor postProcess(at::Tensor& result);
+
         SemanticParams params_;
         Resize resize_;
         Normalize normalize_;
