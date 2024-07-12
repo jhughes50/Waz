@@ -7,22 +7,7 @@
 * Package: Waz
 */
 
-#include "waz/semantics.hpp"
-
-class SemanticsManagerTest
-{
-    public:
-        SemanticsManagerTest() : manager_("/home/jason/config/networks.json", "semantics") {}
-
-        cv::Mat test(cv::Mat& img)
-        {
-            
-        }
-
-
-        SemanticsManager manager_;       
-};
-
+#include "waz/depth.hpp"
 
 void print_tensor_dtype(const torch::Tensor& tensor) 
 {
@@ -67,7 +52,7 @@ void print_tensor_dtype(const torch::Tensor& tensor)
 
 int main(int argc, char **argv)
 {
-    SemanticsManager semantics("/home/jason/config/networks.json", "semantics");
+    DepthManager depth("/home/jason/config/networks.json", "depth");
 
     cv::Mat test_img = cv::imread("/home/jason/test/imgs/test-img.png", cv::IMREAD_COLOR);
     if (test_img.empty())
@@ -79,8 +64,7 @@ int main(int argc, char **argv)
     {
         std::cout << "[TEST] Loaded test image" << std::endl;
     }
-    std::cout << "[TEST] Running image" << std::endl;
-    Eigen::MatrixXi result = semantics.inference(test_img);
-
+    std::cout << "[TEST] Running image through depth model..." << std::endl;
+    Eigen::MatrixXf result = depth.inference(test_img);
     return 0;
 }

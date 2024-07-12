@@ -26,8 +26,7 @@ class SemanticsManager : protected NetworkManager
     public:
 
         SemanticsManager(std::string path, std::string model_id = "semantics");
-        //Eigen::MatrixXf inference(cv::Mat& img);
-        at::Tensor inference(cv::Mat& img);
+        Eigen::MatrixXi inference(cv::Mat& img);
 
         struct SemanticParams : public Params
         {
@@ -52,7 +51,7 @@ class SemanticsManager : protected NetworkManager
 
     private:
 
-        Eigen::MatrixXf tensorToEigen(const at::Tensor& tensor) const noexcept;
+        Eigen::MatrixXi tensorToEigen(const at::Tensor& tensor) const noexcept;
         at::Tensor postProcess(at::Tensor& result);
 
         SemanticParams params_;

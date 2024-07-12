@@ -51,6 +51,18 @@ target_link_libraries(semantics-test
     Eigen3::Eigen
     )
 
+add_executable(depth-test test/cpp/depth_model.cpp)
+target_link_libraries(depth-test
+    ${PROJECT_NAME}
+    ${TORCH_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    jsoncpp_lib
+    ${glog_LIBRARIES}
+    ${GTEST_LIBRARIES}
+    pthread
+    Eigen3::Eigen
+    )
+
 add_executable(preprocess-test test/cpp/preprocess.cpp)
 target_link_libraries(preprocess-test
     ${PROJECT_NAME}

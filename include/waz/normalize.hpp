@@ -27,7 +27,7 @@ class Normalize
         Normalize(const float mean[SIZE], const float std[SIZE]);
         Normalize() = default;
 
-        void operator()(cv::Mat& img);
+        void operator()(cv::Mat& img, const float mean[SIZE], const float std[SIZE], bool norm);
         void operator()(cv::Mat& img, const float mean[SIZE], const float std[SIZE]);
 };
 #endif

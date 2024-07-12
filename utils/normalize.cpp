@@ -11,15 +11,28 @@
 
 Normalize::Normalize(const float mean[SIZE], const float std[SIZE]) : mean_(mean[0], mean[1], mean[2]), std_(std[0], std[1], std[2]) { }
 
-void Normalize::operator()(cv::Mat& img)
+void Normalize::operator()(cv::Mat& img, const float mean[SIZE], const float std[SIZE], bool norm)
 { 
     // convert from BGR to RGB
     cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
-    img.convertTo(img, 5, 1.0/255.0);
+    if (norm)
+    {
+        img.convertTo(img, CV_32F, 1.0/255.0);
+    }
+    else
+    {
+        img.convertTo(img, CV_32F);
+    }
+    // divide by mean subtract std 
+    std::vector<cv::Mat> channels;
+    cv::split(img, channels);
 
-    // divide by mean subtract std
-    cv::subtract(img, mean_, img);
-    cv::divide(img, std_, img);
+    for (int i = 0; i < channels.size(); ++i)
+    {
+        channels[i] = (channels[i] - mean[i]) - std[i];
+    }
+
+    cv::merge(channels, img);
 }
 
 void Normalize::operator()(cv::Mat& img, const float mean[SIZE], const float std[SIZE])
@@ -29,7 +42,7 @@ void Normalize::operator()(cv::Mat& img, const float mean[SIZE], const float std
     std::vector<cv::Mat> channels;
     cv::split(img, channels);
 
-    for (int i =0; i < channels.size(); ++i)
+    for (int i = 0; i < channels.size(); ++i)
     {
         channels[i] = (channels[i] - mean[i]) - std[i];
     }

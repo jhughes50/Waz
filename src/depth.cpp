@@ -7,7 +7,6 @@
 */
 
 #include "waz/depth.hpp"
-#include "waz/resize.hpp"
 
 DepthManager::DepthManager(std::string params_path, std::string model_id) : NetworkManager(params_path, model_id), params_(params_path)
 {
@@ -16,16 +15,7 @@ DepthManager::DepthManager(std::string params_path, std::string model_id) : Netw
 
 void DepthManager::normalizeImage(cv::Mat& img)
 {
-    // convert from BGR to RGB
-    cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
-    img.convertTo(img, 5, 1.0/255.0);
-
-    // divide by mean subtract std
-    cv::Scalar mean_values(params_.mean_r, params_.mean_g, params_.mean_b);
-    cv::Scalar std_values(params_.std_r, params_.std_g, params_.std_b);
-
-    cv::subtract(img, mean_values, img);
-    cv::divide(img, std_values, img);
+    normalize_(img, params_.mean, params_.std, true);
 }
 
 void DepthManager::resizeImage(cv::Mat& img)
@@ -34,19 +24,19 @@ void DepthManager::resizeImage(cv::Mat& img)
     resize(img);
 }
 
-cv::Mat DepthManager::tensorToCv(at::Tensor& tensor) const noexcept
+Eigen::MatrixXf DepthManager::tensorToEigen(const at::Tensor& tensor) const noexcept
 {
-    tensor = tensor.contiguous();
-    //tensor = tensor.to(torch::kFloat32);
-    //tensor = tensor.mul(255).clamp(0,255);
-    //tensor = tensor.to(torch::kUInt8);
+    int rows = tensor.size(0);
+    int cols = tensor.size(1);
+    
+    Eigen::MatrixXf mat(rows, cols);
 
-    cv::Mat img(tensor.size(1), tensor.size(2), CV_8UC1, tensor.data_ptr());
+    std::memcpy(mat.data(), tensor.data_ptr<float>(), sizeof(float) * rows * cols);
 
-    return img;
+    return mat;
 }
 
-cv::Mat DepthManager::inference(cv::Mat& img)
+Eigen::MatrixXf DepthManager::inference(cv::Mat& img)
 {
     at::Tensor input, result;
     normalizeImage(img);
@@ -54,9 +44,10 @@ cv::Mat DepthManager::inference(cv::Mat& img)
     input = cvToTensor(img, true, 0);
 
     result = forward(input).to(at::kCPU);
-    cv::Mat result_img = tensorToCv(result);
+    result = result.squeeze(0);
+    Eigen::MatrixXf result_mat = tensorToEigen(result);
 
-    return result_img;
+    return result_mat;
 }
 
 void DepthManager::DepthParams::setParams() noexcept
@@ -65,12 +56,18 @@ void DepthManager::DepthParams::setParams() noexcept
     channels = params_map_["torch"]["channels"].asInt();
     
     mean_r = params_map_["depth"]["mean_r"].asFloat();
+    mean[0] = mean_r;
     mean_g = params_map_["depth"]["mean_g"].asFloat();
+    mean[1] = mean_g;
     mean_b = params_map_["depth"]["mean_b"].asFloat();
+    mean[2] = mean_b;
 
     std_r = params_map_["depth"]["std_r"].asFloat();
+    std[0] = std_r;
     std_g = params_map_["depth"]["std_g"].asFloat();
+    std[1] = std_g;
     std_b = params_map_["depth"]["std_b"].asFloat();
+    std[2] = std_b;
 
     input_height = params_map_["depth"]["input_height"].asInt();
     input_width = params_map_["depth"]["input_width"].asInt();

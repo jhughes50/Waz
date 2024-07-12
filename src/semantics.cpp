@@ -35,14 +35,14 @@ void SemanticsManager::SemanticParams::setParams() noexcept
     input_width = params_map_["semantics"]["input_width"].asInt();
 }
 
-Eigen::MatrixXf SemanticsManager::tensorToEigen(const at::Tensor& tensor) const noexcept
+Eigen::MatrixXi SemanticsManager::tensorToEigen(const at::Tensor& tensor) const noexcept
 {
     int rows = tensor.size(0);
     int cols = tensor.size(1);
     
-    Eigen::MatrixXf mat(rows, cols);
+    Eigen::MatrixXi mat;
 
-    std::memcpy(mat.data(), tensor.data_ptr<float>(), sizeof(float) * rows * cols);
+    std::memcpy(mat.data(), tensor.data_ptr<int>(), sizeof(int) * rows * cols);
 
     return mat;
 }
@@ -53,7 +53,7 @@ at::Tensor SemanticsManager::postProcess(at::Tensor& result)
     return torch::argmax(result, 0);
 }
 
-at::Tensor SemanticsManager::inference(cv::Mat& img)
+Eigen::MatrixXi SemanticsManager::inference(cv::Mat& img)
 {   
     at::Tensor input, result;
     normalize_(img, params_.mean, params_.std);
@@ -63,8 +63,8 @@ at::Tensor SemanticsManager::inference(cv::Mat& img)
 
     result = forward(input).to(at::kCPU);
     
-    return postProcess(result);
-    //return tensorToEigen(result);
+    result = postProcess(result);
+    return tensorToEigen(result);
 }
 
 
