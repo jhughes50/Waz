@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.1.0-base-ubuntu22.04
+FROM nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu20.04 
 
 RUN apt-get update \
  && export TZ="America/New_York" \
@@ -29,7 +29,19 @@ RUN apt-get update \
  build-essential \
  sudo \
  wget \
- curl
+ curl \
+ zip \
+ unzip
+
+# install libtorch 
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-keyring_1.0-1_all.deb \
+ && dpkg -i cuda-keyring_1.0-1_all.deb \
+ && apt-get update \
+ && apt-get -y install cuda
+RUN wget https://download.pytorch.org/libtorch/cu121/libtorch-cxx11-abi-shared-with-deps-2.3.1%2Bcu121.zip \
+ && unzip *.zip \
+ && mv libtorch/ /opt \
+ && rm *.zip
 
 # add a user
 ARG user_id=1000
@@ -48,6 +60,7 @@ ENV LANGUAGE en_US:en
 
 USER $USER
 COPY .bashrc .
+
 # install Waz depends
 RUN sudo apt-get update \
  && sudo apt-get install -y --no-install-recommends \
@@ -55,7 +68,26 @@ RUN sudo apt-get update \
  libgoogle-glog-dev \
  libopencv-dev \
  libtbb-dev \
- libtorch-dev \
- libyaml-dev
+ libjsoncpp-dev
 
+#install torch for debugging 
+RUN sudo apt-get install -y python3-pip
+RUN pip3 install torch torchvision torchaudio
+RUN pip3 install opencv-python
 WORKDIR /home/jason
+
+RUN pip3 install transformers
+
+# install test dependencies
+RUN pip3 install matplotlib
+RUN sudo apt-get install -y libgtest-dev \
+ && cd /usr/src/gtest \
+ && sudo cmake CMakeLists.txt\
+ && sudo make \
+ && sudo cp lib/*.a /usr/lib
+
+RUN mkdir include/ src/ cmake/ build/ test/ config/ models/ utils/ .waz/
+
+RUN touch CMakeLists.txt
+
+ENV CUDA_HOME=/usr/local/cuda

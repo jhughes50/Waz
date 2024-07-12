@@ -10,12 +10,52 @@
 #ifndef SEMANTICS_HPP
 #define SEMANTICS_HPP
 
-class SemanticModeling
+#include <string>
+#include <opencv2/core.hpp>
+#include <torch/script.h>
+#include <Eigen/Dense>
+
+#include "network_manager.hpp"
+#include "params.hpp"
+#include "resize.hpp"
+#include "normalize.hpp"
+
+
+class SemanticsManager : protected NetworkManager
 {
     public:
-        struct Params
-        {
 
+        SemanticsManager(std::string path, std::string model_id = "semantics");
+        Eigen::MatrixXi inference(cv::Mat& img);
+
+        struct SemanticParams : public Params
+        {
+            using Params::Params;
+            
+            int channels;
+            
+            float mean_r, std_r;
+            float mean_g, std_g;
+            float mean_b, std_b;
+            
+            int input_height, input_width;
+
+            static const int SIZE = 3;
+            float mean[SIZE];
+            float std[SIZE];
+
+            void setParams() noexcept;
         };
+
+        friend class SemanticsManagerTest;
+
+    private:
+
+        Eigen::MatrixXi tensorToEigen(const at::Tensor& tensor) const noexcept;
+        at::Tensor postProcess(at::Tensor& result);
+
+        SemanticParams params_;
+        Resize resize_;
+        Normalize normalize_;
 };
 #endif

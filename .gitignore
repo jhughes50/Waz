@@ -1,1 +1,8 @@
 Docker/.bash_history
+.bash_history
+*.pt
+*.pth
+
+build/
+models/*.pt
+models/*.pth
