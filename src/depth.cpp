@@ -33,6 +33,20 @@ void DepthManager::postProcess(at::Tensor& tensor)
     tensor = tensor.to(torch::kUInt8);
 }
 
+cv::Mat DepthManager::sobel(cv::Mat& img)
+{
+    cv::Mat grad_x, grad_y, grad;
+
+    // Am I doing a harsh type conversion here?
+    cv::Sobel(img, grad_x, CV_64F, 1, 0, 7);
+    cv::Sobel(img, grad_y, CV_64F, 0, 1, 7);
+
+    cv::magnitude(grad_x, grad_y, grad);
+    cv::normalize(grad, grad, 0, 255, cv::NORM_MINMAX, CV_8U);
+
+    return grad;
+}
+
 Eigen::MatrixXi DepthManager::tensorToEigen(const at::Tensor& tensor) const noexcept
 {
     int rows = tensor.size(0);
@@ -58,6 +72,9 @@ cv::Mat DepthManager::tensorToCv(const at::Tensor& tensor) const noexcept
 
 cv::Mat DepthManager::inference(cv::Mat& img)
 {
+    int h = img.rows;
+    int w = img.cols;
+
     at::Tensor input, result;
     normalizeImage(img);
     resizeImage(img);
@@ -67,8 +84,11 @@ cv::Mat DepthManager::inference(cv::Mat& img)
     result = result.squeeze(0);
     postProcess(result);
     cv::Mat result_cv = tensorToCv(result);
+    interpolate_(result_cv, h, w);
 
-    return result_cv;
+    cv::Mat grad = sobel(result_cv);
+
+    return grad;
 }
 
 void DepthManager::DepthParams::setParams() noexcept

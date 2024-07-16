@@ -19,6 +19,7 @@
 #include "params.hpp"
 #include "resize.hpp"
 #include "normalize.hpp"
+#include "interpolate.hpp"
 
 
 class SemanticsManager : protected NetworkManager
@@ -59,5 +60,6 @@ class SemanticsManager : protected NetworkManager
         SemanticParams params_;
         Resize resize_;
         Normalize normalize_;
+        Interpolate interpolate_;
 };
 #endif

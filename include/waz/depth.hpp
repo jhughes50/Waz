@@ -21,6 +21,7 @@
 #include "normalize.hpp"
 #include "resize.hpp"
 #include "params.hpp"
+#include "interpolate.hpp"
 
 class DepthManager : protected NetworkManager
 {
@@ -55,11 +56,14 @@ class DepthManager : protected NetworkManager
         Eigen::MatrixXi tensorToEigen(const at::Tensor& tensor) const noexcept;
         cv::Mat tensorToCv(const at::Tensor& tensor) const noexcept;
 
+        cv::Mat sobel(cv::Mat& img);
+            
         void normalizeImage(cv::Mat& img);
         void resizeImage(cv::Mat& img);
         void postProcess(at::Tensor& tensor);
 
         DepthParams params_;
         Normalize normalize_;
+        Interpolate interpolate_;
 };
 #endif

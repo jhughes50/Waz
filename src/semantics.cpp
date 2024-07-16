@@ -66,6 +66,9 @@ at::Tensor SemanticsManager::postProcess(at::Tensor& result)
 
 cv::Mat SemanticsManager::inference(cv::Mat& img)
 {   
+    int h = img.rows;
+    int w = img.cols;
+
     at::Tensor input, result;
     normalize_(img, params_.mean, params_.std);
     resize_(img, params_.input_width, params_.input_height);
@@ -73,8 +76,9 @@ cv::Mat SemanticsManager::inference(cv::Mat& img)
     input = cvToTensor(img, true, 0);
 
     result = forward(input).to(at::kCPU);
-    
+    result = interpolate_(result, h, w);
     result = postProcess(result);
+
     return tensorToCv(result);
 }
 
