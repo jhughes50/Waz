@@ -47,13 +47,24 @@ Eigen::MatrixXi SemanticsManager::tensorToEigen(const at::Tensor& tensor) const 
     return mat;
 }
 
+cv::Mat SemanticsManager::tensorToCv(const at::Tensor& tensor) const noexcept
+{
+    int rows = tensor.size(0);
+    int cols = tensor.size(1);
+
+    cv::Mat img(rows, cols, CV_8UC1);
+    std::memcpy(img.data, tensor.data_ptr<uint8_t>(), sizeof(torch::kUInt8) * tensor.numel());
+
+    return img;
+}
+
 at::Tensor SemanticsManager::postProcess(at::Tensor& result)
 {
     result.squeeze(0);
-    return torch::argmax(result, 0);
+    return torch::argmax(result, 0).to(torch::kUInt8);
 }
 
-Eigen::MatrixXi SemanticsManager::inference(cv::Mat& img)
+cv::Mat SemanticsManager::inference(cv::Mat& img)
 {   
     at::Tensor input, result;
     normalize_(img, params_.mean, params_.std);
@@ -64,7 +75,7 @@ Eigen::MatrixXi SemanticsManager::inference(cv::Mat& img)
     result = forward(input).to(at::kCPU);
     
     result = postProcess(result);
-    return tensorToEigen(result);
+    return tensorToCv(result);
 }
 
 

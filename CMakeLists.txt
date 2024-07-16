@@ -32,9 +32,11 @@ include_directories(
 
 add_library(${PROJECT_NAME}
     src/network_manager.cpp
-    src/params.cpp
     src/depth.cpp
     src/semantics.cpp
+    src/cost_map.cpp
+    utils/label_map.cpp
+    utils/params.cpp
     utils/resize.cpp
     utils/normalize.cpp
 )

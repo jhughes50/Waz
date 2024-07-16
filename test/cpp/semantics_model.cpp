@@ -80,7 +80,7 @@ int main(int argc, char **argv)
         std::cout << "[TEST] Loaded test image" << std::endl;
     }
     std::cout << "[TEST] Running image" << std::endl;
-    Eigen::MatrixXi result = semantics.inference(test_img);
+    cv::Mat result = semantics.inference(test_img);
 
     return 0;
 }

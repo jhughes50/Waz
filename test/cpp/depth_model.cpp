@@ -65,6 +65,11 @@ int main(int argc, char **argv)
         std::cout << "[TEST] Loaded test image" << std::endl;
     }
     std::cout << "[TEST] Running image through depth model..." << std::endl;
-    Eigen::MatrixXf result = depth.inference(test_img);
+    cv::Mat result = depth.inference(test_img);
+    
+    cv::imshow("depth", result);
+    cv::waitKey(0);
+    cv::destroyAllWindows();
+
     return 0;
 }

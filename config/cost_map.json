@@ -1,0 +1,105 @@
+{
+    "width": 256,
+    "height": 256,
+    "num_classes": 19,
+    "classes":
+    {
+        "0":
+        {
+            "id": "road",
+            "cost": 0
+        },
+        "1":
+        {
+            "id": "sidewalk",
+            "cost": 0
+        },
+        "2":
+        {
+            "id": "building",
+            "cost": 255
+        },
+        "3":
+        {
+            "id": "wall",
+            "cost": 255
+        },
+        "4":
+        {
+            "id": "fence",
+            "cost": 255
+        },
+        "5":
+        {
+            "id": "pole",
+            "cost": 255
+        },
+        "6":
+        {
+            "id": "traffic_light",
+            "cost": 255
+        },
+        "7":
+        {
+            "id": "traffic_sign",
+            "cost": 255
+        },
+        "8":
+        {
+            "id": "vegetation",
+            "cost": 255
+        },
+        "9":
+        {
+            "id": "terrain",
+            "cost": 128
+        },
+        "10":
+        {
+            "id": "sky",
+            "cost": 255
+        },
+        "11":
+        {
+            "id": "person",
+            "cost": 255
+        },
+        "12":
+        {
+            "id": "rider",
+            "cost": 255
+        },
+        "13":
+        {
+            "id": "car",
+            "cost": 255
+        },
+        "14":
+        {
+            "id": "truck",
+            "cost": 255
+        },
+        "15":
+        {
+            "id": "bus",
+            "cost": 255
+        },
+        "16":
+        {
+            "id": "train",
+            "cost": 255
+        },
+        "17":
+        {
+            "id": "motorcycle",
+            "cost": 255
+        },
+        "18":
+        {
+            "id": "bicycle",
+            "cost": 255
+        }
+
+
+    }
+}
