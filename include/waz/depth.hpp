@@ -21,13 +21,14 @@
 #include "normalize.hpp"
 #include "resize.hpp"
 #include "params.hpp"
+#include "interpolate.hpp"
 
 class DepthManager : protected NetworkManager
 {
     public:
         DepthManager(std::string params_path, std::string model_id = "depth");
 
-        Eigen::MatrixXf inference(cv::Mat& img);
+        cv::Mat inference(cv::Mat& img);
 
         struct DepthParams: public Params
         {   
@@ -52,12 +53,17 @@ class DepthManager : protected NetworkManager
         friend class DepthManagerTest;
 
     private:
-        Eigen::MatrixXf tensorToEigen(const at::Tensor& tensor) const noexcept;
+        Eigen::MatrixXi tensorToEigen(const at::Tensor& tensor) const noexcept;
+        cv::Mat tensorToCv(const at::Tensor& tensor) const noexcept;
 
+        cv::Mat sobel(cv::Mat& img);
+            
         void normalizeImage(cv::Mat& img);
         void resizeImage(cv::Mat& img);
-    
+        void postProcess(at::Tensor& tensor);
+
         DepthParams params_;
         Normalize normalize_;
+        Interpolate interpolate_;
 };
 #endif

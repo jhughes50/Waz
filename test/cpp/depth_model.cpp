@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 {
     DepthManager depth("/home/jason/config/networks.json", "depth");
 
-    cv::Mat test_img = cv::imread("/home/jason/test/imgs/test-img.png", cv::IMREAD_COLOR);
+    cv::Mat test_img = cv::imread("/home/jason/test/imgs/test-img-1.png", cv::IMREAD_COLOR);
     if (test_img.empty())
     {
         std::cout << "[TEST] Cound not find test image" << std::endl;
@@ -65,6 +65,11 @@ int main(int argc, char **argv)
         std::cout << "[TEST] Loaded test image" << std::endl;
     }
     std::cout << "[TEST] Running image through depth model..." << std::endl;
-    Eigen::MatrixXf result = depth.inference(test_img);
+    cv::Mat result = depth.inference(test_img);
+    
+    cv::imshow("depth", result);
+    cv::waitKey(0);
+    cv::destroyAllWindows();
+
     return 0;
 }

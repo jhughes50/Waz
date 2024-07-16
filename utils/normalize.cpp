@@ -8,6 +8,7 @@
 */
 
 #include "waz/normalize.hpp"
+#include <iostream>
 
 Normalize::Normalize(const float mean[SIZE], const float std[SIZE]) : mean_(mean[0], mean[1], mean[2]), std_(std[0], std[1], std[2]) { }
 
@@ -37,8 +38,10 @@ void Normalize::operator()(cv::Mat& img, const float mean[SIZE], const float std
 
 void Normalize::operator()(cv::Mat& img, const float mean[SIZE], const float std[SIZE])
 {
+    // SegFormer normalization
     img.convertTo(img, CV_32F);
 
+    //cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
     std::vector<cv::Mat> channels;
     cv::split(img, channels);
 

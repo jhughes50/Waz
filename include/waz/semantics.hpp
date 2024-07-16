@@ -19,6 +19,7 @@
 #include "params.hpp"
 #include "resize.hpp"
 #include "normalize.hpp"
+#include "interpolate.hpp"
 
 
 class SemanticsManager : protected NetworkManager
@@ -26,7 +27,7 @@ class SemanticsManager : protected NetworkManager
     public:
 
         SemanticsManager(std::string path, std::string model_id = "semantics");
-        Eigen::MatrixXi inference(cv::Mat& img);
+        cv::Mat inference(cv::Mat& img);
 
         struct SemanticParams : public Params
         {
@@ -52,10 +53,13 @@ class SemanticsManager : protected NetworkManager
     private:
 
         Eigen::MatrixXi tensorToEigen(const at::Tensor& tensor) const noexcept;
+        cv::Mat tensorToCv(const at::Tensor& tensor) const noexcept;
+
         at::Tensor postProcess(at::Tensor& result);
 
         SemanticParams params_;
         Resize resize_;
         Normalize normalize_;
+        Interpolate interpolate_;
 };
 #endif

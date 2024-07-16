@@ -24,20 +24,57 @@ void DepthManager::resizeImage(cv::Mat& img)
     resize(img);
 }
 
-Eigen::MatrixXf DepthManager::tensorToEigen(const at::Tensor& tensor) const noexcept
+void DepthManager::postProcess(at::Tensor& tensor)
+{
+    at::Tensor min = torch::min(tensor);
+    at::Tensor max = torch::max(tensor);
+
+    tensor = (tensor - min) / (max - min) * 255.0;
+    tensor = tensor.to(torch::kUInt8);
+}
+
+cv::Mat DepthManager::sobel(cv::Mat& img)
+{
+    cv::Mat grad_x, grad_y, grad;
+
+    // Am I doing a harsh type conversion here?
+    cv::Sobel(img, grad_x, CV_64F, 1, 0, 7);
+    cv::Sobel(img, grad_y, CV_64F, 0, 1, 7);
+
+    cv::magnitude(grad_x, grad_y, grad);
+    cv::normalize(grad, grad, 0, 255, cv::NORM_MINMAX, CV_8U);
+
+    return grad;
+}
+
+Eigen::MatrixXi DepthManager::tensorToEigen(const at::Tensor& tensor) const noexcept
 {
     int rows = tensor.size(0);
     int cols = tensor.size(1);
-    
-    Eigen::MatrixXf mat(rows, cols);
 
-    std::memcpy(mat.data(), tensor.data_ptr<float>(), sizeof(float) * rows * cols);
+    Eigen::MatrixXi mat(rows, cols);
+
+    std::memcpy(mat.data(), tensor.data_ptr<uint8_t>(), sizeof(int) * rows * cols);
 
     return mat;
 }
 
-Eigen::MatrixXf DepthManager::inference(cv::Mat& img)
+cv::Mat DepthManager::tensorToCv(const at::Tensor& tensor) const noexcept
 {
+    int rows = tensor.size(0);
+    int cols = tensor.size(1);
+
+    cv::Mat img(rows, cols, CV_8UC1);
+    std::memcpy(img.data, tensor.data_ptr<uint8_t>(), sizeof(torch::kUInt8) * tensor.numel());
+
+    return img;
+}
+
+cv::Mat DepthManager::inference(cv::Mat& img)
+{
+    int h = img.rows;
+    int w = img.cols;
+
     at::Tensor input, result;
     normalizeImage(img);
     resizeImage(img);
@@ -45,9 +82,13 @@ Eigen::MatrixXf DepthManager::inference(cv::Mat& img)
 
     result = forward(input).to(at::kCPU);
     result = result.squeeze(0);
-    Eigen::MatrixXf result_mat = tensorToEigen(result);
+    postProcess(result);
+    cv::Mat result_cv = tensorToCv(result);
+    interpolate_(result_cv, h, w);
 
-    return result_mat;
+    cv::Mat grad = sobel(result_cv);
+
+    return grad;
 }
 
 void DepthManager::DepthParams::setParams() noexcept
