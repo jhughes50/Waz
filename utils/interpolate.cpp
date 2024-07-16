@@ -11,7 +11,7 @@
 at::Tensor Interpolate::operator()(at::Tensor& tensor, int h, int w)
 {
     return torch::nn::functional::interpolate(
-        tensor.unsqueeze(0).unsqueeze(0),  // Add batch and channel dimensions
+        tensor,  
         torch::nn::functional::InterpolateFuncOptions()
             .size(std::vector<int64_t>{h, w})
             .mode(torch::kBilinear)

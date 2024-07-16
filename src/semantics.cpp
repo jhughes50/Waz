@@ -25,11 +25,11 @@ void SemanticsManager::SemanticParams::setParams() noexcept
     mean[2] = mean_b;
 
     std_r = params_map_["semantics"]["std_r"].asFloat();
-    mean[0] = std_r;
+    std[0] = std_r;
     std_g = params_map_["semantics"]["std_g"].asFloat();
-    mean[1] = std_g;
+    std[1] = std_g;
     std_b = params_map_["semantics"]["std_b"].asFloat();
-    mean[2] = std_b;
+    std[2] = std_b;
 
     input_height = params_map_["semantics"]["input_height"].asInt();
     input_width = params_map_["semantics"]["input_width"].asInt();
@@ -60,7 +60,7 @@ cv::Mat SemanticsManager::tensorToCv(const at::Tensor& tensor) const noexcept
 
 at::Tensor SemanticsManager::postProcess(at::Tensor& result)
 {
-    result.squeeze(0);
+    result = result.squeeze(0);
     return torch::argmax(result, 0).to(torch::kUInt8);
 }
 
@@ -72,14 +72,14 @@ cv::Mat SemanticsManager::inference(cv::Mat& img)
     at::Tensor input, result;
     normalize_(img, params_.mean, params_.std);
     resize_(img, params_.input_width, params_.input_height);
-
+    
     input = cvToTensor(img, true, 0);
 
     result = forward(input).to(at::kCPU);
     result = interpolate_(result, h, w);
-    result = postProcess(result);
-
-    return tensorToCv(result);
+    at::Tensor n_result = postProcess(result);
+    
+    return tensorToCv(n_result);
 }
 
 

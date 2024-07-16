@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 {
     SemanticsManager semantics("/home/jason/config/networks.json", "semantics");
 
-    cv::Mat test_img = cv::imread("/home/jason/test/imgs/test-img.png", cv::IMREAD_COLOR);
+    cv::Mat test_img = cv::imread("/home/jason/test/imgs/test-img-1.png", cv::IMREAD_COLOR);
     if (test_img.empty())
     {
         std::cout << "[TEST] Cound not find test image" << std::endl;
@@ -81,6 +81,9 @@ int main(int argc, char **argv)
     }
     std::cout << "[TEST] Running image" << std::endl;
     cv::Mat result = semantics.inference(test_img);
+    std::cout << result.col(128) << std::endl;
+    std::cout << "Dims: " << result.dims << std::endl;
+    std::cout << "Img with: " << result.rows << " by " << result.cols << std::endl;
 
     return 0;
 }

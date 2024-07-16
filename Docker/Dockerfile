@@ -86,6 +86,8 @@ RUN sudo apt-get install -y libgtest-dev \
  && sudo make \
  && sudo cp lib/*.a /usr/lib
 
+RUN sudo apt-get install -y gdb
+
 RUN mkdir include/ src/ cmake/ build/ test/ config/ models/ utils/ .waz/
 
 RUN touch CMakeLists.txt
