@@ -42,6 +42,7 @@ add_library(${PROJECT_NAME}
     utils/resize.cpp
     utils/normalize.cpp
     utils/interpolate.cpp
+    utils/average.cpp
     utils/mode.cpp
     utils/max.cpp
 )
@@ -66,6 +67,7 @@ target_link_libraries(depth-test
     jsoncpp_lib
     ${glog_LIBRARIES}
     ${GTEST_LIBRARIES}
+    TBB::tbb
     pthread
     Eigen3::Eigen
     )

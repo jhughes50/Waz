@@ -1,8 +1,11 @@
 {
-    "width": 320,
-    "height": 180,
-    "kernel": 4,
-    "num_classes": 19,
+    "sizing":
+    {
+        "width": 320,
+        "height": 180,
+        "kernel": 4,
+        "num_classes": 19
+    },
     "classes":
     {
         "0":

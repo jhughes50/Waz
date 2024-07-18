@@ -18,6 +18,7 @@
 #include "label_map.hpp"
 #include "params.hpp"
 #include "model.hpp"
+#include "average.hpp"
 #include "mode.hpp"
 #include "max.hpp"
 
@@ -28,15 +29,32 @@ class CostMap
         //CostMap(int width, int height);
         CostMap(std::string path);
 
-        struct Initializer
+        cv::Mat kernalizeMask(const cv::Mat& mask, Model model) noexcept;
+        cv::Mat getCostMap(cv::Mat& depth, cv::Mat& semantics) noexcept;
+
+        struct DepthCost
+        {
+            cv::Mat& cost_map;
+            cv::Mat& depth;
+            double avg;
+
+            DepthCost(cv::Mat& cm, cv::Mat& d, double avg);
+            DepthCost(DepthCost& dc, tbb::split);
+
+            void operator()(const tbb::blocked_range2d<int>& r);
+            void join(const DepthCost& other);
+        };
+        
+        struct SemanticCost
         {
             cv::Mat& mat;
             CostMap* cost_map;
 
-            Initializer(cv::Mat& m, CostMap* cm);
-            Initializer(Initializer& s, tbb::split);
+            SemanticCost(cv::Mat& m, CostMap* cm);
+            SemanticCost(SemanticCost& s, tbb::split);
 
             void operator()(const tbb::blocked_range2d<int>& r);
+            void join(const SemanticCost& other);
         };
 
         struct CostMapParams : public Params 
@@ -50,18 +68,13 @@ class CostMap
             void setParams() noexcept;
         };
 
-        LabelMap getLabelMap(uint8_t label);
-
         friend struct Initializer;
 
     private:
-        static const int SIZE = 256;
-        Eigen::Matrix<uint8_t, SIZE, SIZE> cost_map_;
-    
-        void searchDepthForObjects(const Eigen::MatrixXf& depth);
-        cv::Mat kernalizeMask(const cv::Mat& mask, Model model) noexcept;
-        
+        void costFromSemantics(cv::Mat& semantics, cv::Mat& cost_map);
+        void costFromDepth(cv::Mat& depth, cv::Mat& cost_map); 
         CostMapParams params_;
+        Average average_;
         Mode mode_;
         Max max_;
 };
