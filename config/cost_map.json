@@ -1,6 +1,7 @@
 {
-    "width": 256,
-    "height": 256,
+    "width": 320,
+    "height": 180,
+    "kernel": 4,
     "num_classes": 19,
     "classes":
     {
@@ -99,7 +100,5 @@
             "id": "bicycle",
             "cost": 255
         }
-
-
     }
 }

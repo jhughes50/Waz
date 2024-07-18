@@ -29,6 +29,7 @@ include_directories(
     ${glog_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
+    ${TBB_INCLUDE_DIRS}
 )
 
 add_library(${PROJECT_NAME}
@@ -41,6 +42,8 @@ add_library(${PROJECT_NAME}
     utils/resize.cpp
     utils/normalize.cpp
     utils/interpolate.cpp
+    utils/mode.cpp
+    utils/max.cpp
 )
 
 add_executable(semantics-test test/cpp/semantics_model.cpp)
