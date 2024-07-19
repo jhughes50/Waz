@@ -37,6 +37,7 @@ add_library(${PROJECT_NAME}
     src/depth.cpp
     src/semantics.cpp
     src/cost_map.cpp
+    src/search.cpp
     utils/label_map.cpp
     utils/params.cpp
     utils/resize.cpp
