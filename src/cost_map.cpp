@@ -42,9 +42,10 @@ cv::Mat CostMap::getCostMap(cv::Mat& depth, cv::Mat& semantics) noexcept
 {
     cv::Mat depth_down_res = kernalizeMask(depth, Model::DEPTH);
     cv::Mat semantics_down_res = kernalizeMask(semantics, Model::SEMANTICS);
-
-    cv::Mat cost_map(params_.height, params_.width, CV_8UC1);
-
+    
+    // initialize the cost map as the semantic map;
+    cv::Mat cost_map = semantics_down_res.clone();
+   
     // must initialize cost_map from semantics before depth
     costFromSemantics(semantics_down_res, cost_map);
     costFromDepth(depth_down_res, cost_map);
@@ -54,7 +55,7 @@ cv::Mat CostMap::getCostMap(cv::Mat& depth, cv::Mat& semantics) noexcept
 
 void CostMap::costFromSemantics(cv::Mat& semantics, cv::Mat& cost_map)
 {
-    SemanticCost semantic_cost(semantics, this);
+    SemanticCost semantic_cost(cost_map, params_.label_map);
     tbb::parallel_reduce(tbb::blocked_range2d<int>(0, semantics.rows, 0, semantics.cols), semantic_cost);
 }
 
@@ -70,7 +71,7 @@ void CostMap::costFromDepth(cv::Mat& depth, cv::Mat& cost_map)
     tbb::parallel_reduce(tbb::blocked_range2d<int>(0, depth.rows, 0, depth.cols), depth_cost); 
 }
 
-
+// Depth Cost Calculation
 CostMap::DepthCost::DepthCost(cv::Mat& cm, cv::Mat& d, double a) : cost_map(cm), depth(d), avg(a) { }
 
 CostMap::DepthCost::DepthCost(DepthCost& dc, tbb::split) : cost_map(dc.cost_map), depth(dc.depth), avg(dc.avg) { }
@@ -97,10 +98,10 @@ void CostMap::DepthCost::operator()(const tbb::blocked_range2d<int>& r)
 
 void CostMap::DepthCost::join(const DepthCost& other) { }
 
+// Semantic Cost Calculation
+CostMap::SemanticCost::SemanticCost(cv::Mat& m, std::map<int, LabelMap>& lm) : mat(m), label_map(lm) { }
 
-CostMap::SemanticCost::SemanticCost(cv::Mat& m, CostMap* cm) : mat(m), cost_map(cm) { }
-
-CostMap::SemanticCost::SemanticCost(SemanticCost& s, tbb::split) : mat(s.mat) { }
+CostMap::SemanticCost::SemanticCost(SemanticCost& s, tbb::split) : mat(s.mat), label_map(s.label_map) { }
 
 void CostMap::SemanticCost::operator()(const tbb::blocked_range2d<int>& r)
 {
@@ -109,15 +110,15 @@ void CostMap::SemanticCost::operator()(const tbb::blocked_range2d<int>& r)
         for (int j = r.cols().begin(); j != r.cols().end(); ++j)
         {
             uint8_t label = mat.at<uint8_t>(i,j);
-            LabelMap lm = cost_map->params_.label_map[label];
-            mat.at<uint8_t>(i, j) = lm.cost;
+            //std::cout << "label: " << std::to_string(label) << std::endl;
+            LabelMap ll = label_map[label];
+            mat.at<uint8_t>(i, j) = ll.cost;
         }
     }
 } 
 
 void CostMap::SemanticCost::join(const SemanticCost& other) { }
 
-// call with tbb::parallel_reduce(tbb::blocked_range2d<int>(0,ROWS, 0,COlS), init)
 
 void CostMap::CostMapParams::setParams() noexcept
 {
@@ -131,8 +132,7 @@ void CostMap::CostMapParams::setParams() noexcept
     {
         std::string i_str = std::to_string(i);
         std::string label = params_map_["classes"][i_str]["id"].asString();
-        uint8_t cost = params_map_["classes"][i_str]["cost"].asInt();
-
+        uint8_t cost = static_cast<uint8_t>(params_map_["classes"][i_str]["cost"].asInt());
         label_map[i] = LabelMap(label, cost, i);
     }
 }

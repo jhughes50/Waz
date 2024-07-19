@@ -48,9 +48,9 @@ class CostMap
         struct SemanticCost
         {
             cv::Mat& mat;
-            CostMap* cost_map;
+            std::map<int, LabelMap>& label_map;
 
-            SemanticCost(cv::Mat& m, CostMap* cm);
+            SemanticCost(cv::Mat& m, std::map<int,LabelMap>& lm);
             SemanticCost(SemanticCost& s, tbb::split);
 
             void operator()(const tbb::blocked_range2d<int>& r);
@@ -73,6 +73,10 @@ class CostMap
     private:
         void costFromSemantics(cv::Mat& semantics, cv::Mat& cost_map);
         void costFromDepth(cv::Mat& depth, cv::Mat& cost_map); 
+
+        cv::Mat semantic_map_;
+        cv::Mat depth_map_;
+
         CostMapParams params_;
         Average average_;
         Mode mode_;
