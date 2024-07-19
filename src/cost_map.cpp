@@ -53,6 +53,11 @@ cv::Mat CostMap::getCostMap(cv::Mat& depth, cv::Mat& semantics) noexcept
     return cost_map;
 }
 
+cv::Point CostMap::getStart()
+{
+    return cv::Point(params_.width/2, params_.height);
+}
+
 void CostMap::costFromSemantics(cv::Mat& semantics, cv::Mat& cost_map)
 {
     SemanticCost semantic_cost(cost_map, params_.label_map);

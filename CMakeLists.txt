@@ -38,6 +38,7 @@ add_library(${PROJECT_NAME}
     src/semantics.cpp
     src/cost_map.cpp
     src/search.cpp
+    src/waz.cpp
     utils/label_map.cpp
     utils/params.cpp
     utils/resize.cpp

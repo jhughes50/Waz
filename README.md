@@ -15,3 +15,6 @@ cmake --build . --config Release
 
 ### TODOs
 1. Make the device configurable using TorchScript -- Not sure this is possible
+2. Make cost higher around objects
+3. Convert Path from lower resolution to higher resolution
+4. Convert the path to trajecories.
