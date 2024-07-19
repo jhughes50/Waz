@@ -51,7 +51,7 @@ cv::Mat SemanticsManager::tensorToCv(const at::Tensor& tensor) const noexcept
 {
     int rows = tensor.size(0);
     int cols = tensor.size(1);
-
+    
     cv::Mat img(rows, cols, CV_8UC1);
     std::memcpy(img.data, tensor.data_ptr<uint8_t>(), sizeof(torch::kUInt8) * tensor.numel());
 
@@ -64,11 +64,11 @@ at::Tensor SemanticsManager::postProcess(at::Tensor& result)
     return torch::argmax(result, 0).to(torch::kUInt8);
 }
 
-cv::Mat SemanticsManager::inference(cv::Mat& img)
+cv::Mat SemanticsManager::inference(cv::Mat img)
 {   
     int h = img.rows;
     int w = img.cols;
-
+   
     at::Tensor input, result;
     normalize_(img, params_.mean, params_.std);
     resize_(img, params_.input_width, params_.input_height);

@@ -70,7 +70,7 @@ cv::Mat DepthManager::tensorToCv(const at::Tensor& tensor) const noexcept
     return img;
 }
 
-cv::Mat DepthManager::inference(cv::Mat& img)
+cv::Mat DepthManager::inference(cv::Mat img)
 {
     int h = img.rows;
     int w = img.cols;

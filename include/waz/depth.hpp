@@ -28,7 +28,7 @@ class DepthManager : protected NetworkManager
     public:
         DepthManager(std::string params_path, std::string model_id = "depth");
 
-        cv::Mat inference(cv::Mat& img);
+        cv::Mat inference(cv::Mat img);
 
         struct DepthParams: public Params
         {   

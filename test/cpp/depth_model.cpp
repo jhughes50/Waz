@@ -8,6 +8,8 @@
 */
 
 #include "waz/depth.hpp"
+#include "waz/model.hpp"
+#include "waz/cost_map.hpp"
 
 void print_tensor_dtype(const torch::Tensor& tensor) 
 {
@@ -53,6 +55,7 @@ void print_tensor_dtype(const torch::Tensor& tensor)
 int main(int argc, char **argv)
 {
     DepthManager depth("/home/jason/config/networks.json", "depth");
+    CostMap cost_map("/home/jason/config/cost_map.json");
 
     cv::Mat test_img = cv::imread("/home/jason/test/imgs/test-img-1.png", cv::IMREAD_COLOR);
     if (test_img.empty())
@@ -66,8 +69,9 @@ int main(int argc, char **argv)
     }
     std::cout << "[TEST] Running image through depth model..." << std::endl;
     cv::Mat result = depth.inference(test_img);
-    
-    cv::imshow("depth", result);
+    cv::Mat kern = cost_map.kernalizeMask(result, Model::DEPTH);
+    std::cout << kern.rows << "  " << kern.cols << std::endl;
+    cv::imshow("depth", kern);
     cv::waitKey(0);
     cv::destroyAllWindows();
 

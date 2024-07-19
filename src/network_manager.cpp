@@ -10,7 +10,7 @@
 NetworkManager::NetworkManager(std::string params_path, std::string model_id) : params_(params_path)
 {
     // have the constructor load the params json and set them 
-    google::InitGoogleLogging("/home/jason/.waz/");
+    // google::InitGoogleLogging("/home/jason/.waz/");
     model_id_ = model_id;
     params_.setParams(model_id);
     //device_ = at::kCUDA;

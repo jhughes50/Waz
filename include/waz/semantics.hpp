@@ -27,7 +27,7 @@ class SemanticsManager : protected NetworkManager
     public:
 
         SemanticsManager(std::string path, std::string model_id = "semantics");
-        cv::Mat inference(cv::Mat& img);
+        cv::Mat inference(cv::Mat img);
 
         struct SemanticParams : public Params
         {

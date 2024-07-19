@@ -29,6 +29,7 @@ include_directories(
     ${glog_INCLUDE_DIRS}
     ${GTEST_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
+    ${TBB_INCLUDE_DIRS}
 )
 
 add_library(${PROJECT_NAME}
@@ -41,6 +42,9 @@ add_library(${PROJECT_NAME}
     utils/resize.cpp
     utils/normalize.cpp
     utils/interpolate.cpp
+    utils/average.cpp
+    utils/mode.cpp
+    utils/max.cpp
 )
 
 add_executable(semantics-test test/cpp/semantics_model.cpp)
@@ -63,6 +67,20 @@ target_link_libraries(depth-test
     jsoncpp_lib
     ${glog_LIBRARIES}
     ${GTEST_LIBRARIES}
+    TBB::tbb
+    pthread
+    Eigen3::Eigen
+    )
+
+add_executable(cost-map-test test/cpp/cost_map_test.cpp)
+target_link_libraries(cost-map-test
+    ${PROJECT_NAME}
+    ${TORCH_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    jsoncpp_lib
+    ${glog_LIBRARIES}
+    ${GTEST_LIBRARIES}
+    TBB::tbb
     pthread
     Eigen3::Eigen
     )
