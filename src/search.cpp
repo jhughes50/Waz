@@ -9,13 +9,9 @@
 
 #include "waz/search.hpp"
 
-AStarSearch::AStarSearch(const cv::Mat& cost_map)
-{
-    // pass?
-}
-
 AStarSearch::~AStarSearch()
 {
+    std::cout << "[ASTAR] Destructing" << std::endl;
     for (Node* node : all_nodes_)
     {
         delete node;
@@ -33,15 +29,14 @@ void AStarSearch::cleanup()
 std::vector<cv::Point> AStarSearch::search(const cv::Mat& cost_map, const cv::Point& start, const cv::Point& goal)
 {
     std::priority_queue<Node*, std::vector<Node*>, CompareNode> open_nodes;
-    std::vector<std::vector<bool>> visited_nodes(cost_map.rows, std::vector<bool>(cost_map.cols, false));
-    //std::vector<Node*> all_nodes;
-
+    cv::Mat visited_nodes = cv::Mat::zeros(cost_map.rows, cost_map.cols, CV_8U);
+    
     Node* start_node = new Node(start.x, start.y, 0, 0, nullptr);
     all_nodes_.push_back(start_node);
 
     start_node->heuristic_cost = std::sqrt(std::pow(goal.x - start.x, 2) + std::pow(goal.y - start.y, 2));
     open_nodes.push(start_node);
-
+    
     while (!open_nodes.empty())
     {
         Node* current = open_nodes.top();
@@ -57,18 +52,18 @@ std::vector<cv::Point> AStarSearch::search(const cv::Mat& cost_map, const cv::Po
                 current = current->parent;
             }
             std::reverse(path.begin(), path.end());
-            cleanup();
+            //cleanup();
             return path;
         }
 
-        visited_nodes[current->y][current->x] = true;
-
-        for (int i=0; i<8; ++i)
+        visited_nodes.at<bool>(current->x, current->y) = true;
+        
+        for (int i=0; i < SIZE; ++i)
         {
             int new_x = current->x + dx_[i];
             int new_y = current->y + dy_[i];
 
-            if (new_x >= 0 && new_x < cost_map.cols && new_y >= 0 && new_y < cost_map.rows && cost_map.at<uint8_t>(new_x, new_y) != 255 && !visited_nodes[new_x][new_y])
+            if (new_x >= 0 && new_x < cost_map.cols && new_y >= 0 && new_y < cost_map.rows && cost_map.at<uint8_t>(new_x, new_y) != 255 && !visited_nodes.at<bool>(new_x, new_y))
              {
                 double new_gc = current->goal_cost + (i < 4 ? 1.0 : std::sqrt(2.0));
                 double new_hc = std::sqrt(std::pow(goal.x - new_x, 2) + std::pow(goal.y - new_y, 2));
@@ -80,7 +75,7 @@ std::vector<cv::Point> AStarSearch::search(const cv::Mat& cost_map, const cv::Po
         }
     }
     
-    cleanup();
+    //cleanup();
     return std::vector<cv::Point>();
 }
 

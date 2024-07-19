@@ -17,7 +17,7 @@
 class AStarSearch
 {
     public:
-        AStarSearch(const cv::Mat& cost_map);
+        AStarSearch() = default;
         ~AStarSearch();
 
         std::vector<cv::Point> search(const cv::Mat& cost_map, const cv::Point& start, const cv::Point& goal);

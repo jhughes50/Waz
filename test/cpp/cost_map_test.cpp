@@ -10,6 +10,7 @@
 #include "waz/cost_map.hpp"
 #include "waz/depth.hpp"
 #include "waz/semantics.hpp"
+#include "waz/search.hpp"
 
 int main(int argc, char **argv)
 {
@@ -31,14 +32,28 @@ int main(int argc, char **argv)
         std::cout << "[TEST] Loaded test image" << std::endl;
     }
  
+    std::cout << "[TEST] Inferenceing Depth Model" << std::endl;
     cv::Mat depth_mat = depth.inference(test_img);
+    std::cout << "[TEST] Inferencing Semantics Model" << std::endl;
     cv::Mat semantics_mat = semantics.inference(test_img);
 
+    std::cout << "[TEST] Getting Cost Map" << std::endl;
     cv::Mat cost_map_mat = cost_map.getCostMap(depth_mat, semantics_mat);
 
+    std::cout << "[TEST] Showing Cost Map" << std::endl;
     cv::imshow("Cost Map", cost_map_mat);
     cv::waitKey(0);
     cv::destroyAllWindows();
+
+    AStarSearch astar;
+    cv::Point start(160, 180);
+    cv::Point goal(160, 90);
+
+    std::vector<cv::Point> path;
+
+    path = astar.search(cost_map_mat, start, goal);
+
+    std::cout << "[Test] Got path with size: " << path.size() << std::endl;
 
     return 0;
 }
