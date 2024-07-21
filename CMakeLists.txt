@@ -87,6 +87,19 @@ target_link_libraries(cost-map-test
     Eigen3::Eigen
     )
 
+add_executable(waz-test test/cpp/waz_test.cpp)
+target_link_libraries(waz-test
+    ${PROJECT_NAME}
+    ${TORCH_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    jsoncpp_lib
+    ${glog_LIBRARIES}
+    ${GTEST_LIBRARIES}
+    TBB::tbb
+    pthread
+    Eigen3::Eigen
+    )
+
 add_executable(preprocess-test test/cpp/preprocess.cpp)
 target_link_libraries(preprocess-test
     ${PROJECT_NAME}
