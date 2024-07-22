@@ -68,6 +68,9 @@ cv::Mat CostMap::getCostMap(cv::Mat& depth, cv::Mat& semantics) noexcept
 
     cost_map.row(params_.height-1).setTo(cv::Scalar(0));
 
+    BufferCostMap bufferer(cost_map, params_.buffer);
+    tbb::parallel_reduce(tbb::blocked_range2d<int>(0, cost_map.rows, 0, cost_map.cols), bufferer);
+
     return cost_map;
 }
 
@@ -112,11 +115,73 @@ void CostMap::BuildCostMap::operator()(const tbb::blocked_range2d<int>& r)
 
 void CostMap::BuildCostMap::join(const BuildCostMap& other) { }
 
+// add a buffer around objects in the cost map
+CostMap::BufferCostMap::BufferCostMap(cv::Mat& cm, int b) : cost_map(cm), buff(b) { }
+
+CostMap::BufferCostMap::BufferCostMap(BufferCostMap& bcm, tbb::split) : cost_map(bcm.cost_map), buff(bcm.buff) { }
+
+void CostMap::BufferCostMap::operator()(const tbb::blocked_range2d<int>& r)
+{
+    for (int i = r.rows().begin(); i != r.rows().end(); ++i)
+    {
+        for (int j = r.cols().begin(); j != r.cols().end(); ++j)
+        {
+            if (cost_map.at<uint8_t>(i,j) == 255 && i > buff && i < cost_map.cols-buff && j > buff && j < cost_map.rows-buff)
+            {
+                if (cost_map.at<uint8_t>(i-1,j) != 255)
+                {
+                    buffer(cost_map, 0, i, j);
+                }
+                if (cost_map.at<uint8_t>(i+1,j) != 255)
+                {
+                    buffer(cost_map, 1, i ,j);
+                }
+                if (cost_map.at<uint8_t>(i,j-1) != 255) 
+                {
+                    buffer(cost_map, 2, i, j);
+                }
+                if (cost_map.at<uint8_t>(i,j+1) != 255)
+                {
+                    buffer(cost_map, 3, i ,j);
+                }
+            }
+            else
+            {
+                continue;
+            }
+        }
+    }
+}
+
+void CostMap::BufferCostMap::buffer(cv::Mat& cost_map, uint8_t dir, int i, int j)
+{
+    if (dir == 0)
+    {
+        cost_map(cv::Range(i-buff,i), cv::Range(j,j+1)) = 128;
+    }
+    else if (dir == 1)
+    {
+        cost_map(cv::Range(i,i+buff), cv::Range(j,j+1)) = 128;
+    }
+    else if (dir == 2)
+    {
+        cost_map(cv::Range(i,i+1), cv::Range(j-buff,j)) = 128;
+    }
+    else if (dir == 3)
+    {
+        cost_map(cv::Range(i,i+1), cv::Range(j,j+buff)) = 128;
+    }
+}
+
+void CostMap::BufferCostMap::join(const BufferCostMap& other) { }
+
 void CostMap::CostMapParams::setParams() noexcept
 {
     width = params_map_["sizing"]["width"].asInt();
     height = params_map_["sizing"]["height"].asInt();
     kernel = params_map_["sizing"]["kernel"].asInt();
+    buffer = params_map_["sizing"]["buffer"].asInt();
+    threshold = params_map_["sizing"]["threshold"].asInt();
 
     int num_classes = params_map_["sizing"]["num_classes"].asInt();
 

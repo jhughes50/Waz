@@ -35,6 +35,21 @@ class CostMap
         int getScale() const noexcept;
         cv::Point getStart();
 
+        struct BufferCostMap
+        {
+            cv::Mat& cost_map;
+            int buff;
+
+            BufferCostMap(cv::Mat& cm, int buffer);
+            BufferCostMap(BufferCostMap& bcm, tbb::split);
+
+            void operator()(const tbb::blocked_range2d<int>& r);
+            void join(const BufferCostMap& other);
+
+            private:
+                void buffer(cv::Mat& cost_map, uint8_t dir, int i, int j);
+        };
+
         struct BuildCostMap
         {
             cv::Mat& depth;
@@ -57,6 +72,8 @@ class CostMap
 
             int width, height;
             int kernel;
+            int buffer;
+            int threshold;
             std::map<int, LabelMap> label_map;
 
             void setParams() noexcept;

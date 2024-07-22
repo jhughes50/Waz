@@ -4,6 +4,8 @@
         "width": 160,
         "height": 90,
         "kernel": 8,
+        "buffer": 8,
+        "threshold": 20,
         "num_classes": 19
     },
     "classes":
