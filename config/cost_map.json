@@ -1,9 +1,9 @@
 {
     "sizing":
     {
-        "width": 320,
-        "height": 180,
-        "kernel": 4,
+        "width": 160,
+        "height": 90,
+        "kernel": 8,
         "num_classes": 19
     },
     "classes":

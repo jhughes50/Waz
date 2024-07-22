@@ -13,6 +13,7 @@
 #include <queue>
 #include <vector>
 #include <cmath>
+#include <cassert>
 
 class AStarSearch
 {

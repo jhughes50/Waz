@@ -37,7 +37,8 @@ add_library(${PROJECT_NAME}
     src/depth.cpp
     src/semantics.cpp
     src/cost_map.cpp
-    src/search.cpp
+    src/waz.cpp
+    src/astar.cpp
     utils/label_map.cpp
     utils/params.cpp
     utils/resize.cpp
@@ -75,6 +76,19 @@ target_link_libraries(depth-test
 
 add_executable(cost-map-test test/cpp/cost_map_test.cpp)
 target_link_libraries(cost-map-test
+    ${PROJECT_NAME}
+    ${TORCH_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    jsoncpp_lib
+    ${glog_LIBRARIES}
+    ${GTEST_LIBRARIES}
+    TBB::tbb
+    pthread
+    Eigen3::Eigen
+    )
+
+add_executable(waz-test test/cpp/waz_test.cpp)
+target_link_libraries(waz-test
     ${PROJECT_NAME}
     ${TORCH_LIBRARIES}
     ${OpenCV_LIBRARIES}

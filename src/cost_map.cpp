@@ -40,9 +40,20 @@ cv::Mat CostMap::kernalizeMask(const cv::Mat& mask, Model model) noexcept
 
 cv::Mat CostMap::getCostMap(cv::Mat& depth, cv::Mat& semantics) noexcept
 {
-    cv::Mat depth_down_res = kernalizeMask(depth, Model::DEPTH);
-    cv::Mat semantics_down_res = kernalizeMask(semantics, Model::SEMANTICS);
-    
+    cv::Mat depth_down_res;
+    cv::Mat semantics_down_res;
+
+    if (params_.kernel > 1)
+    {
+        depth_down_res = kernalizeMask(depth, Model::DEPTH);
+        semantics_down_res = kernalizeMask(semantics, Model::SEMANTICS);
+    }
+    else
+    {
+        semantics_down_res = semantics;
+        depth_down_res = depth;
+    }
+
     // initialize the cost map as the semantic map;
     cv::Mat cost_map = semantics_down_res.clone();
    
@@ -50,7 +61,19 @@ cv::Mat CostMap::getCostMap(cv::Mat& depth, cv::Mat& semantics) noexcept
     costFromSemantics(semantics_down_res, cost_map);
     costFromDepth(depth_down_res, cost_map);
 
+    cost_map.row(params_.height-1).setTo(cv::Scalar(0));
+
     return cost_map;
+}
+
+cv::Point CostMap::getStart()
+{
+    return cv::Point(params_.width/2, params_.height);
+}
+
+int CostMap::getScale() const noexcept
+{   
+    return params_.kernel;
 }
 
 void CostMap::costFromSemantics(cv::Mat& semantics, cv::Mat& cost_map)
@@ -87,7 +110,7 @@ void CostMap::DepthCost::operator()(const tbb::blocked_range2d<int>& r)
 
             if (cost_map_val != 255)
             {
-                if ((depth_val > (avg + 10)) || (depth_val < (avg - 10)))
+                if ((depth_val > (avg + 20)) || (depth_val < (avg - 20)))
                 {
                     cost_map.at<uint8_t>(i,j) = 255;
                 }
