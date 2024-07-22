@@ -35,29 +35,20 @@ class CostMap
         int getScale() const noexcept;
         cv::Point getStart();
 
-        struct DepthCost
+        struct BuildCostMap
         {
-            cv::Mat& cost_map;
             cv::Mat& depth;
+            cv::Mat& semantics;
+            cv::Mat& cost_map;
+
+            std::map<int, LabelMap>& label_map;
             double avg;
 
-            DepthCost(cv::Mat& cm, cv::Mat& d, double avg);
-            DepthCost(DepthCost& dc, tbb::split);
+            BuildCostMap(cv::Mat& d, cv::Mat& s, cv::Mat& cm, std::map<int,LabelMap>& lm, double a);
+            BuildCostMap(BuildCostMap& bcm, tbb::split);
 
             void operator()(const tbb::blocked_range2d<int>& r);
-            void join(const DepthCost& other);
-        };
-        
-        struct SemanticCost
-        {
-            cv::Mat& mat;
-            std::map<int, LabelMap>& label_map;
-
-            SemanticCost(cv::Mat& m, std::map<int,LabelMap>& lm);
-            SemanticCost(SemanticCost& s, tbb::split);
-
-            void operator()(const tbb::blocked_range2d<int>& r);
-            void join(const SemanticCost& other);
+            void join(const BuildCostMap& other);
         };
 
         struct CostMapParams : public Params 
@@ -74,8 +65,6 @@ class CostMap
         friend struct Initializer;
 
     private:
-        void costFromSemantics(cv::Mat& semantics, cv::Mat& cost_map);
-        void costFromDepth(cv::Mat& depth, cv::Mat& cost_map); 
 
         CostMapParams params_;
         Average average_;

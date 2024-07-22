@@ -56,10 +56,15 @@ cv::Mat CostMap::getCostMap(cv::Mat& depth, cv::Mat& semantics) noexcept
 
     // initialize the cost map as the semantic map;
     cv::Mat cost_map = semantics_down_res.clone();
-   
-    // must initialize cost_map from semantics before depth
-    costFromSemantics(semantics_down_res, cost_map);
-    costFromDepth(depth_down_res, cost_map);
+
+    int middle[2] = {params_.width / 2, params_.height};
+
+    cv::Mat rect = depth_down_res(cv::Rect(middle[0] - 10, middle[1] - 20, 20, 20));
+    double avg = average_(rect);
+    
+
+    BuildCostMap builder(depth_down_res, semantics_down_res, cost_map, params_.label_map, avg);
+    tbb::parallel_reduce(tbb::blocked_range2d<int>(0, cost_map.rows, 0, cost_map.cols), builder);
 
     cost_map.row(params_.height-1).setTo(cv::Scalar(0));
 
@@ -76,39 +81,25 @@ int CostMap::getScale() const noexcept
     return params_.kernel;
 }
 
-void CostMap::costFromSemantics(cv::Mat& semantics, cv::Mat& cost_map)
-{
-    SemanticCost semantic_cost(cost_map, params_.label_map);
-    tbb::parallel_reduce(tbb::blocked_range2d<int>(0, semantics.rows, 0, semantics.cols), semantic_cost);
-}
 
-void CostMap::costFromDepth(cv::Mat& depth, cv::Mat& cost_map)
-{
-    // get the pixel where the robot is
-    int middle[2] = {params_.width / 2, params_.height};
+// Build Cost Map, a combination of SemanticCost and DepthCost
+CostMap::BuildCostMap::BuildCostMap(cv::Mat& d, cv::Mat& s, cv::Mat& cm, std::map<int,LabelMap>& lm, double a) : depth(d), semantics(s), cost_map(cm), label_map(lm), avg(a) { }
 
-    cv::Mat rect = depth(cv::Rect(middle[0] - 10, middle[1] - 20, 20, 20));
-    double avg = average_(rect);
+CostMap::BuildCostMap::BuildCostMap(BuildCostMap& bcm, tbb::split) : depth(bcm.depth), semantics(bcm.semantics), cost_map(bcm.cost_map), label_map(bcm.label_map), avg(bcm.avg) { }
 
-    DepthCost depth_cost(cost_map, depth, avg);
-    tbb::parallel_reduce(tbb::blocked_range2d<int>(0, depth.rows, 0, depth.cols), depth_cost); 
-}
-
-// Depth Cost Calculation
-CostMap::DepthCost::DepthCost(cv::Mat& cm, cv::Mat& d, double a) : cost_map(cm), depth(d), avg(a) { }
-
-CostMap::DepthCost::DepthCost(DepthCost& dc, tbb::split) : cost_map(dc.cost_map), depth(dc.depth), avg(dc.avg) { }
-
-void CostMap::DepthCost::operator()(const tbb::blocked_range2d<int>& r)
+void CostMap::BuildCostMap::operator()(const tbb::blocked_range2d<int>& r)
 { 
     for (int i = r.rows().begin(); i != r.rows().end(); ++i)
     {
         for (int j = r.cols().begin(); j != r.cols().end(); ++j)
         {
-            uint8_t cost_map_val = cost_map.at<uint8_t>(i,j);
+            uint8_t label = semantics.at<uint8_t>(i,j);
+            LabelMap ll = label_map[label];
+            cost_map.at<uint8_t>(i, j) = ll.cost;
+
             uint8_t depth_val = depth.at<uint8_t>(i,j);
 
-            if (cost_map_val != 255)
+            if (ll.cost != 255)
             {
                 if ((depth_val > (avg + 20)) || (depth_val < (avg - 20)))
                 {
@@ -119,29 +110,7 @@ void CostMap::DepthCost::operator()(const tbb::blocked_range2d<int>& r)
     }
 }
 
-void CostMap::DepthCost::join(const DepthCost& other) { }
-
-// Semantic Cost Calculation
-CostMap::SemanticCost::SemanticCost(cv::Mat& m, std::map<int, LabelMap>& lm) : mat(m), label_map(lm) { }
-
-CostMap::SemanticCost::SemanticCost(SemanticCost& s, tbb::split) : mat(s.mat), label_map(s.label_map) { }
-
-void CostMap::SemanticCost::operator()(const tbb::blocked_range2d<int>& r)
-{
-    for (int i = r.rows().begin(); i != r.rows().end(); ++i)
-    {
-        for (int j = r.cols().begin(); j != r.cols().end(); ++j)
-        {
-            uint8_t label = mat.at<uint8_t>(i,j);
-            //std::cout << "label: " << std::to_string(label) << std::endl;
-            LabelMap ll = label_map[label];
-            mat.at<uint8_t>(i, j) = ll.cost;
-        }
-    }
-} 
-
-void CostMap::SemanticCost::join(const SemanticCost& other) { }
-
+void CostMap::BuildCostMap::join(const BuildCostMap& other) { }
 
 void CostMap::CostMapParams::setParams() noexcept
 {

@@ -29,7 +29,7 @@ int main(int argc, char **argv)
         cv::resize(test_img, test_img, dims, cv::INTER_AREA);
     }
 
-    cv::Point goal(80,45);
+    cv::Point goal(60,35);
     std::vector<cv::Point> path = waz(test_img, goal);
    
     std::cout << "[TEST] Path length: " << path.size() << std::endl;
