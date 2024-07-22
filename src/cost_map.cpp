@@ -71,6 +71,11 @@ cv::Point CostMap::getStart()
     return cv::Point(params_.width/2, params_.height);
 }
 
+int CostMap::getScale() const noexcept
+{   
+    return params_.kernel;
+}
+
 void CostMap::costFromSemantics(cv::Mat& semantics, cv::Mat& cost_map)
 {
     SemanticCost semantic_cost(cost_map, params_.label_map);
@@ -105,7 +110,7 @@ void CostMap::DepthCost::operator()(const tbb::blocked_range2d<int>& r)
 
             if (cost_map_val != 255)
             {
-                if ((depth_val > (avg + 15)) || (depth_val < (avg - 15)))
+                if ((depth_val > (avg + 20)) || (depth_val < (avg - 20)))
                 {
                     cost_map.at<uint8_t>(i,j) = 255;
                 }

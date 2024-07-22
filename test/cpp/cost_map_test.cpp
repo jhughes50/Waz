@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     
     CostMap cost_map("/home/jason/config/cost_map.json");
     
-    cv::Mat test_img = cv::imread("/home/jason/test/imgs/potholes.jpg", cv::IMREAD_COLOR);
+    cv::Mat test_img = cv::imread("/home/jason/test/imgs/test-img-1.png", cv::IMREAD_COLOR);
     if (test_img.empty())
     {
         std::cout << "[TEST] Cound not find test image" << std::endl;
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
     std::cout << "[TEST] Showing Cost Map" << std::endl;
     cv::cvtColor(cost_map_mat, cost_map_mat, cv::COLOR_GRAY2BGR); 
     cv::Point start(80, 90);
-    cv::Point goal(80, 40);
+    cv::Point goal(80, 45);
 
     cv::circle(cost_map_mat, start, 3, cv::Scalar(0,0,255), -1); 
     cv::circle(cost_map_mat, goal, 3, cv::Scalar(0,0,255), -1);

@@ -32,6 +32,7 @@ class CostMap
         cv::Mat kernalizeMask(const cv::Mat& mask, Model model) noexcept;
         cv::Mat getCostMap(cv::Mat& depth, cv::Mat& semantics) noexcept;
         cv::Mat getCostMap() const noexcept;
+        int getScale() const noexcept;
         cv::Point getStart();
 
         struct DepthCost

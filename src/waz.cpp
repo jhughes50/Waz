@@ -12,7 +12,7 @@ Waz::Waz(std::string path) : depth_(path+"networks.json"), semantics_(path+"netw
 
 Waz::~Waz()
 {
-    //delete astar_;
+
 }
 
 std::vector<cv::Point> Waz::operator()(cv::Mat& img, cv::Point& goal)
@@ -30,16 +30,19 @@ std::vector<cv::Point> Waz::operator()(cv::Mat& img, cv::Point& goal)
     return path;
 }
 
-cv::Mat Waz::drawPath(cv::Mat img, std::vector<cv::Point> path)
+cv::Mat Waz::drawPath(cv::Mat img, std::vector<cv::Point> path, bool upscale)
 {
-    int scale = 8;
-    UpscalePath up(path, scale);
+    if (upscale)
+    {    
+        int scale = cost_map_.getScale();
+        UpscalePath up(path, scale);
 
-    tbb::parallel_reduce(tbb::blocked_range<int>(0,path.size()), up);
+        tbb::parallel_reduce(tbb::blocked_range<int>(0,path.size()), up);
+    }
 
     for(const auto& point : path)
     {
-        cv::circle(img, point, 1, cv::Scalar(0,0,255), -1);    
+        cv::circle(img, point, 3, cv::Scalar(0,0,255), -1);    
     }
 
     return img;

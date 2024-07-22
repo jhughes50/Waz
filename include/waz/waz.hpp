@@ -21,7 +21,7 @@
 #include "depth.hpp"
 #include "semantics.hpp"
 #include "cost_map.hpp"
-#include "search.hpp"
+#include "astar.hpp"
 
 class Waz
 {
@@ -31,7 +31,7 @@ class Waz
         ~Waz();
         
         std::vector<cv::Point> operator()(cv::Mat& img, cv::Point& goal);
-        cv::Mat drawPath(cv::Mat img, std::vector<cv::Point> path);
+        cv::Mat drawPath(cv::Mat img, std::vector<cv::Point> path, bool upscale=true);
     
         cv::Mat getCostMap() const noexcept;
         std::vector<cv::Point> getPath() const noexcept;
