@@ -23,6 +23,7 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 include_directories(
     include
+    ros/include
     ${OpenCV_INCLUDE_DIRS}
     ${TORCH_INCLUDE_DIRS}
     ${Json_INCLUDE_DIRS}
