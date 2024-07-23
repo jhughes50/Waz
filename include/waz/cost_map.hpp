@@ -83,6 +83,8 @@ class CostMap
 
     private:
 
+        cv::Mat fillCostMap(cv::Mat& cost_map);
+
         CostMapParams params_;
         Average average_;
         Mode mode_;
