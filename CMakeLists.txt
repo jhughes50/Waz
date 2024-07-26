@@ -12,6 +12,18 @@ set(Json_INCLUDE_DIRS "/usr/include/jsoncpp")
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+option(BUILD_ROS "Build ROS" ON)
+
+find_package(catkin REQUIRED COMPONENTS
+	roscpp
+	nav_msgs
+	visualization_msgs
+	sensor_msgs
+	std_msgs
+	cv_bridge
+	image_transport
+	tf2_ros
+)
 find_package(Torch REQUIRED PATHS "${TORCH_ROOT}")
 find_package(TBB REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -21,9 +33,21 @@ find_package(GTest REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
+if (NOT catkin_FOUND)
+    set(BUILD_ROS OFF)
+    message(WARNING "BUILD_ROS set to OFF because catkin not found")
+endif()
+
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES waz
+  CATKIN_DEPENDS nav_msgs visualization_msgs roscpp sensor_msgs std_msgs cv_bridge image_transport tf2_ros
+# DEPENDS system_lib
+)
+
 include_directories(
     include
-    ros/include
+    ${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
     ${TORCH_INCLUDE_DIRS}
     ${Json_INCLUDE_DIRS}
@@ -50,6 +74,20 @@ add_library(${PROJECT_NAME}
     utils/max.cpp
 )
 
+add_executable(wazros ros/wazros.cpp ros/wazros_node.cpp)
+target_link_libraries(wazros
+    ${PROJECT_NAME}
+    ${TORCH_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    jsoncpp_lib
+    ${glog_LIBRARIES}
+    ${GTEST_LIBRARIES}
+    TBB::tbb
+    pthread
+    Eigen3::Eigen
+    ${catkin_LIBRARIES}
+    )
+
 add_executable(semantics-test test/cpp/semantics_model.cpp)
 target_link_libraries(semantics-test
     ${PROJECT_NAME}
@@ -60,6 +98,7 @@ target_link_libraries(semantics-test
     ${GTEST_LIBRARIES}
     pthread
     Eigen3::Eigen
+    ${catkin_LIBRARIES}
     )
 
 add_executable(depth-test test/cpp/depth_model.cpp)
@@ -73,6 +112,7 @@ target_link_libraries(depth-test
     TBB::tbb
     pthread
     Eigen3::Eigen
+    ${catkin_LIBRARIES}
     )
 
 add_executable(cost-map-test test/cpp/cost_map_test.cpp)
@@ -86,6 +126,7 @@ target_link_libraries(cost-map-test
     TBB::tbb
     pthread
     Eigen3::Eigen
+    ${catkin_LIBRARIES}
     )
 
 add_executable(waz-test test/cpp/waz_test.cpp)
@@ -99,6 +140,7 @@ target_link_libraries(waz-test
     TBB::tbb
     pthread
     Eigen3::Eigen
+    ${catkin_LIBRARIES}
     )
 
 add_executable(preprocess-test test/cpp/preprocess.cpp)
@@ -111,6 +153,7 @@ target_link_libraries(preprocess-test
     ${GTEST_LIBRARIES}
     pthread
     Eigen3::Eigen
+    ${catkin_LIBRARIES}
     )
 #add_executable(model-test test/models.cpp)
 #target_link_libraries(model-test

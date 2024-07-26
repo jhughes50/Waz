@@ -6,8 +6,8 @@
 * Package: Waz
 */
 
-#include "waz/resize.hpp"
-#include "waz/normalize.hpp"
+#include "waz/utils/resize.hpp"
+#include "waz/utils/normalize.hpp"
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp> 
 #include <opencv2/highgui/highgui.hpp>

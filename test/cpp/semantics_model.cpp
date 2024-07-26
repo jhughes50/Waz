@@ -7,7 +7,7 @@
 * Package: Waz
 */
 
-#include "waz/semantics.hpp"
+#include "waz/api/semantics.hpp"
 
 class SemanticsManagerTest
 {

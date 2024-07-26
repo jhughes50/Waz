@@ -6,7 +6,7 @@
 * Package: Waz
 */
 
-#include "waz/label_map.hpp"
+#include "waz/utils/label_map.hpp"
 
 LabelMap::LabelMap(std::string l, uint8_t c, uint8_t i)
 {

@@ -15,12 +15,12 @@
 #include <tbb/parallel_reduce.h>
 #include <tbb/blocked_range2d.h>
 
-#include "label_map.hpp"
-#include "params.hpp"
-#include "model.hpp"
-#include "average.hpp"
-#include "mode.hpp"
-#include "max.hpp"
+#include "waz/utils/label_map.hpp"
+#include "waz/utils/params.hpp"
+#include "waz/utils/model.hpp"
+#include "waz/utils/average.hpp"
+#include "waz/utils/mode.hpp"
+#include "waz/utils/max.hpp"
 
 class CostMap
 {

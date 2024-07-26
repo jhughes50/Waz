@@ -7,7 +7,7 @@
 * Package: Waz 
 */
 
-#include "waz/mode.hpp"
+#include "waz/utils/mode.hpp"
 
 uint8_t Mode::operator()(cv::Mat& mat)
 {

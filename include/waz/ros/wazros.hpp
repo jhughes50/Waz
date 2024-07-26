@@ -14,15 +14,21 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
 
+#include "waz/api/waz.hpp"
+
 class WazRos
 {
     public:
-        WazRos();
+        WazRos(Waz waz);
         
-        void imageCallback(const sensor_msgs::ImageConstPtr& msg);
+        void imageCallback(const sensor_msgs::CompressedImageConstPtr& msg);
 
     private:
         ros::NodeHandle nh_;
         ros::Subscriber image_sub_;
+        ros::Publisher img_pub_;
+        ros::Publisher cost_map_pub_;
+
+        Waz waz_;
 };
 #endif

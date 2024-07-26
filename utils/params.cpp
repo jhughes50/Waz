@@ -5,7 +5,7 @@
 * Package: Waz
 */
 
-#include "waz/params.hpp"
+#include "waz/utils/params.hpp"
 
 Params::Params(std::string path)
 {

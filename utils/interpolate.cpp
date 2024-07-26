@@ -6,7 +6,7 @@
 * Package: Waz
 */
 
-#include "waz/interpolate.hpp"
+#include "waz/utils/interpolate.hpp"
 
 at::Tensor Interpolate::operator()(at::Tensor& tensor, int h, int w)
 {

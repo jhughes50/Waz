@@ -6,8 +6,7 @@
 * Package: Waz
 */
 
-#include "waz/resize.hpp"
-#include <iostream>
+#include "waz/utils/resize.hpp"
 
 Resize::Resize(int width, int height, bool resize_target, int multiple_of)
 {

@@ -7,9 +7,8 @@
 * Package: Waz
 */
 
-#include "waz/depth.hpp"
-#include "waz/model.hpp"
-#include "waz/cost_map.hpp"
+#include "waz/api/depth.hpp"
+#include "waz/api/cost_map.hpp"
 
 void print_tensor_dtype(const torch::Tensor& tensor) 
 {

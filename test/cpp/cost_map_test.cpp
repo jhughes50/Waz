@@ -7,10 +7,9 @@
 */
 
 #include <opencv2/opencv.hpp>
-#include "waz/cost_map.hpp"
-#include "waz/depth.hpp"
-#include "waz/semantics.hpp"
-#include "waz/search.hpp"
+#include "waz/api/cost_map.hpp"
+#include "waz/api/depth.hpp"
+#include "waz/api/semantics.hpp"
 
 int main(int argc, char **argv)
 {

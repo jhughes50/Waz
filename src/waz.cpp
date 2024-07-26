@@ -6,7 +6,7 @@
 * Package: Waz
 */
 
-#include "waz/waz.hpp"
+#include "waz/api/waz.hpp"
 
 Waz::Waz(std::string path) : depth_(path+"networks.json"), semantics_(path+"networks.json"), cost_map_(path+"cost_map.json") { }
 
@@ -23,7 +23,11 @@ std::vector<cv::Point> Waz::operator()(cv::Mat& img, cv::Point& goal)
     current_cost_map_ = cost_map_.getCostMap(depth, semantics);
     cv::Point start = cost_map_.getStart();
     
-    assert(current_cost_map_.at<uchar>(start) != 255);
+    if (current_cost_map_.at<uchar>(start) == 255)
+    {
+        std::cout << "[WAZ] cost map goal not reachable" << std::endl;
+        return {};
+    }
 
     std::vector<cv::Point> path = astar_.search(current_cost_map_, start, goal);
 

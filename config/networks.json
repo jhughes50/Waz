@@ -1,7 +1,7 @@
 {
     "depth":
     {
-        "path": "/home/jason/models/depth-anything-v2-base-traced.pt",
+        "path": "/home/jason/ws/src/waz/models/depth-anything-v2-base-traced.pt",
         "patch": 14,
         "mean_r": 0.485,
         "mean_g": 0.456,
@@ -14,7 +14,7 @@
     },
     "semantics":
     {
-        "path": "/home/jason/models/segformer-b1-cityscapes-1024-traced.pt",
+        "path": "/home/jason/ws/src/waz/models/segformer-b1-cityscapes-1024-traced.pt",
         "mean_r": 123.675,
         "mean_g": 116.28,
         "mean_b": 103.53,
