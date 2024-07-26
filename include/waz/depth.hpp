@@ -42,6 +42,7 @@ class DepthManager : protected NetworkManager
             float mean_b, std_b;
 
             int input_height, input_width;
+            int filter_size;
 
             static const int SIZE = 3;
             float mean[SIZE];

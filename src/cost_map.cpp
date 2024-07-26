@@ -16,6 +16,7 @@ CostMap::CostMap(std::string path) : params_(path)
 cv::Mat CostMap::kernalizeMask(const cv::Mat& mask, Model model) noexcept
 {
     // can this be parallelized using TBB???
+    // Not in a thread safe way
     cv::Mat map(params_.height, params_.width, CV_8UC1);
     for(int i=0, i_map=0; i < (mask.rows - params_.kernel) ; i += params_.kernel, ++i_map)
     {
@@ -68,9 +69,14 @@ cv::Mat CostMap::getCostMap(cv::Mat& depth, cv::Mat& semantics) noexcept
 
     cost_map.row(params_.height-1).setTo(cv::Scalar(0));
 
-    //BufferCostMap bufferer(cost_map, params_.buffer);
-    //tbb::parallel_reduce(tbb::blocked_range2d<int>(0, cost_map.rows, 0, cost_map.cols), bufferer);
-    cost_map = fillCostMap(cost_map);
+    pre_filled_ = cost_map.clone();
+
+    BufferRow buffer_row(cost_map, params_.buffer);
+    tbb::parallel_reduce(tbb::blocked_range<int>(0, cost_map.rows), buffer_row);
+
+    BufferCol buffer_col(cost_map, params_.buffer);
+    tbb::parallel_reduce(tbb::blocked_range<int>(0, cost_map.cols), buffer_col);
+    //fillCostMap(cost_map);
 
     return cost_map;
 }
@@ -83,6 +89,11 @@ cv::Point CostMap::getStart()
 int CostMap::getScale() const noexcept
 {   
     return params_.kernel;
+}
+
+cv::Mat CostMap::getPreFilled() const noexcept
+{
+    return pre_filled_;
 }
 
 
@@ -110,95 +121,143 @@ void CostMap::BuildCostMap::operator()(const tbb::blocked_range2d<int>& r)
                     cost_map.at<uint8_t>(i,j) = 255;
                 }
             }
-            
-            
-
         }
     }
 }
 
 void CostMap::BuildCostMap::join(const BuildCostMap& other) { }
 
-cv::Mat CostMap::fillCostMap(cv::Mat& cost_map)
+void CostMap::fillCostMap(cv::Mat& cost_map)
 {
     int buff2 = params_.buffer / 2;
     int buff = params_.buffer;
-    cv::Mat cm_clone = cost_map.clone();
+    //cv::Mat cm_clone = cost_map.clone();
 
     for (int i=0; i < cost_map.rows; ++i)
-    {
-        for (int j=0; j<cost_map.cols; ++j)
-        { 
-            if (i-buff2>0 && i < cost_map.cols-buff2 && j-buff2>0 && j < cost_map.rows-buff2 && cost_map.at<uint8_t>(i,j) == 255)
+    { 
+        cv::Mat cm_row = cost_map.row(i);
+        for (int j = 1; j < cost_map.cols-1; ++j)
+        {
+            uint8_t val = cost_map.at<uint8_t>(i,j);
+            uint8_t val_m1 = cost_map.at<uint8_t>(i,j-1);
+            uint8_t val_p1 = cost_map.at<uint8_t>(i,j+1);
+
+            if (val == 0 && val_p1 == 255) // backfill
             {
-                cv::Mat kern = cm_clone(cv::Rect(i-buff2, j-buff2, buff, buff));
-                for (int k=0; k < kern.rows; ++k)
+                if (j <= buff)
                 {
-                    for (int l=0; l < kern.cols; ++l)
-                    {
-                        if (kern.at<uint8_t>(k,l) != 255)
-                        {
-                            kern.at<uint8_t>(k,l) = 128;
-                        }
-                    }
+                    cm_row(cv::Range::all(), cv::Range(0,j)).setTo(255);
+                }
+                else
+                {
+                    cm_row(cv::Range::all(), cv::Range(j-buff, j+1)).setTo(255);
+                }
+            }
+            else if (val == 255 && val_p1 == 0) // forwardfill
+            {
+                if (j > cost_map.cols-buff)
+                {
+                    cm_row(cv::Range::all(),cv::Range(j,cost_map.cols-1)).setTo(255);
+                }
+                else
+                {
+                    cm_row(cv::Range::all(), cv::Range(j, j+buff)).setTo(255);
                 }
             }
         }
     }
-    return cm_clone;
+    //return cm_clone;
 }
     
 // add a buffer around objects in the cost map
-CostMap::BufferCostMap::BufferCostMap(cv::Mat& cm, int b) : cost_map(cm), buff(b) { }
+CostMap::BufferRow::BufferRow(cv::Mat& cm, int b) : cost_map(cm), buff(b) { }
 
-CostMap::BufferCostMap::BufferCostMap(BufferCostMap& bcm, tbb::split) : cost_map(bcm.cost_map), buff(bcm.buff) { }
+CostMap::BufferRow::BufferRow(BufferRow& bcm, tbb::split) : cost_map(bcm.cost_map), buff(bcm.buff) { }
 
-void CostMap::BufferCostMap::operator()(const tbb::blocked_range2d<int>& r)
+void CostMap::BufferRow::operator()(const tbb::blocked_range<int>& range)
 {
-    for (int i = r.rows().begin(); i != r.rows().end(); ++i)
+
+    for (int row = range.begin(); row < range.end(); ++row)
     {
-        for (int j = r.cols().begin(); j != r.cols().end(); ++j)
+        cv::Mat cm_row = cost_map.row(row);
+        for (int i = 1; i < cost_map.cols-1; ++i)
         {
-            int buff2 = buff / 2;
-            if (i-buff2>0 && i < cost_map.cols-buff2 && j-buff2>0 && j < cost_map.rows-buff2 && cost_map.at<uint8_t>(i,j) == 255)
+            uint8_t val = cost_map.at<uint8_t>(row,i);
+            uint8_t val_m1 = cost_map.at<uint8_t>(row,i-1);
+            uint8_t val_p1 = cost_map.at<uint8_t>(row,i+1);
+
+            if (val == 0 && val_p1 == 255) // backfill
             {
-                cv::Mat kern = cost_map(cv::Rect(i-buff2, j-buff2, buff, buff));
-                for (int k=0; k < kern.rows; ++k)
+                if (i <= buff)
                 {
-                    for (int l=0; l < kern.cols; ++l)
-                    {
-                        if (kern.at<uint8_t>(k,l) != 255)
-                        {
-                            kern.at<uint8_t>(k,l) = 128;
-                        }
-                    }
+                    cm_row(cv::Range::all(), cv::Range(0, i)).setTo(255);
+                }
+                else
+                {
+                    cm_row(cv::Range::all(), cv::Range(i-buff, i+1)).setTo(255);
+                }
+            }
+            else if (val == 255 && val_p1 == 0) // forwardfill
+            {
+                if (i > cost_map.cols-buff)
+                {
+                    cm_row(cv::Range::all(), cv::Range(i, cost_map.cols-1)).setTo(255);
+                }
+                else
+                {
+                    cm_row(cv::Range::all(), cv::Range(i, i+buff)).setTo(255);
+                    i+= buff+1;
                 }
             }
         }
     }
 }
 
-void CostMap::BufferCostMap::buffer(cv::Mat& cost_map, uint8_t dir, int i, int j)
+void CostMap::BufferRow::join(const BufferRow& other) { }
+
+CostMap::BufferCol::BufferCol(cv::Mat& cm, int b) : cost_map(cm), buff(b) { }
+
+CostMap::BufferCol::BufferCol(BufferCol& bcm, tbb::split) : cost_map(bcm.cost_map), buff(bcm.buff) { }
+
+void CostMap::BufferCol::operator()(const tbb::blocked_range<int>& range)
 {
-    if (dir == 0)
+    for (int col = range.begin(); col < range.end(); ++col)
     {
-        cost_map(cv::Range(i-buff,i), cv::Range(j,j+1)) = 128;
-    }
-    else if (dir == 1)
-    {
-        cost_map(cv::Range(i,i+buff), cv::Range(j,j+1)) = 128;
-    }
-    else if (dir == 2)
-    {
-        cost_map(cv::Range(i,i+1), cv::Range(j-buff,j)) = 128;
-    }
-    else if (dir == 3)
-    {
-        cost_map(cv::Range(i,i+1), cv::Range(j,j+buff)) = 128;
+        cv::Mat cm_col = cost_map.col(col);
+        for (int i = 1; i < cost_map.rows-1; ++i)
+        { 
+            uint8_t val = cost_map.at<uint8_t>(i,col);
+            uint8_t val_m1 = cost_map.at<uint8_t>(i-1,col);
+            uint8_t val_p1 = cost_map.at<uint8_t>(i+1,col);
+
+            if (val == 255 && val_p1 == 0) // upfill
+            {
+                if (i <= buff)
+                {
+                    cm_col(cv::Range(0, i), cv::Range::all()).setTo(255);
+                }
+                else
+                {
+                    cm_col(cv::Range(i-buff, i+1), cv::Range::all()).setTo(255);
+                }
+            }
+            else if (val == 255 && val_p1 == 0) // downfill
+            {
+                if (i > cost_map.cols-buff)
+                {
+                    cm_col(cv::Range(i, cost_map.cols-1), cv::Range::all()).setTo(255);
+                }
+                else
+                {
+                    cm_col(cv::Range(i, i+buff), cv::Range::all()).setTo(255);
+                    i+= buff+1;
+                }
+            }
+        }
     }
 }
 
-void CostMap::BufferCostMap::join(const BufferCostMap& other) { }
+void CostMap::BufferCol::join(const BufferCol& other) { }
 
 void CostMap::CostMapParams::setParams() noexcept
 {

@@ -29,7 +29,7 @@ int main(int argc, char **argv)
         cv::resize(test_img, test_img, dims, cv::INTER_AREA);
     }
 
-    cv::Point goal(60,35);
+    cv::Point goal(60,95);
     std::vector<cv::Point> path = waz(test_img, goal);
    
     std::cout << "[TEST] Path length: " << path.size() << std::endl;
@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     cv::Mat cmd = waz.drawPath(cost_map, path, false);
 
     cv::imshow("cost map path", cmd);
-
+    cv::imshow("prefilled", waz.getPreFilledCostMap()); 
     cv::Mat drawn = waz.drawPath(test_img, path);
     
     cv::imshow("path", drawn);

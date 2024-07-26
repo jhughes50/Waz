@@ -14,6 +14,7 @@
 #include <opencv2/opencv.hpp>
 #include <tbb/parallel_reduce.h>
 #include <tbb/blocked_range2d.h>
+#include <tbb/parallel_for.h>
 
 #include "label_map.hpp"
 #include "params.hpp"
@@ -34,20 +35,30 @@ class CostMap
         cv::Mat getCostMap() const noexcept;
         int getScale() const noexcept;
         cv::Point getStart();
+        cv::Mat getPreFilled() const noexcept;
 
-        struct BufferCostMap
+        struct BufferCol
         {
             cv::Mat& cost_map;
             int buff;
 
-            BufferCostMap(cv::Mat& cm, int buffer);
-            BufferCostMap(BufferCostMap& bcm, tbb::split);
+            BufferCol(cv::Mat& cm, int buff);
+            BufferCol(BufferCol& bcm, tbb::split);
 
-            void operator()(const tbb::blocked_range2d<int>& r);
-            void join(const BufferCostMap& other);
+            void operator()(const tbb::blocked_range<int>& range);
+            void join(const BufferCol& other);
+        };
 
-            private:
-                void buffer(cv::Mat& cost_map, uint8_t dir, int i, int j);
+        struct BufferRow
+        {
+            cv::Mat& cost_map;
+            int buff;
+
+            BufferRow(cv::Mat& cm, int buffer);
+            BufferRow(BufferRow& bcm, tbb::split);
+
+            void operator()(const tbb::blocked_range<int>& range);
+            void join(const BufferRow& other);
         };
 
         struct BuildCostMap
@@ -83,7 +94,9 @@ class CostMap
 
     private:
 
-        cv::Mat fillCostMap(cv::Mat& cost_map);
+        void fillCostMap(cv::Mat& cost_map);
+
+        cv::Mat pre_filled_;
 
         CostMapParams params_;
         Average average_;
