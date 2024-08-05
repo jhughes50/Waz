@@ -8,6 +8,10 @@
         "threshold": 20,
         "num_classes": 19
     },
+    "robot":
+    {
+        "pixel_width": 256  
+    },
     "classes":
     {
         "0":
