@@ -71,10 +71,11 @@ cv::Mat CostMap::getCostMap(cv::Mat& depth, cv::Mat& semantics) noexcept
 
     pre_filled_ = cost_map.clone();
 
-    BufferRow buffer_row(cost_map, params_.buffer);
+    //cv::Mat for_filling = cost_map(cv::Range(params_.pixel_width, cost_map.rows-1), cv::Range::all());
+    BufferRow buffer_row(cost_map, params_.pixel_width, params_.edge_buffer);
     tbb::parallel_reduce(tbb::blocked_range<int>(0, cost_map.rows), buffer_row);
 
-    BufferCol buffer_col(cost_map, params_.buffer);
+    BufferCol buffer_col(cost_map, params_.vertical_buffer, params_.edge_buffer);
     tbb::parallel_reduce(tbb::blocked_range<int>(0, cost_map.cols), buffer_col);
     //fillCostMap(cost_map);
 
@@ -170,17 +171,25 @@ void CostMap::fillCostMap(cv::Mat& cost_map)
 }
     
 // add a buffer around objects in the cost map
-CostMap::BufferRow::BufferRow(cv::Mat& cm, int b) : cost_map(cm), buff(b) { }
+// Buffer the width
+CostMap::BufferRow::BufferRow(cv::Mat& cm, int pw, int b) : cost_map(cm), pixel_width(pw), buffer(b) { }
 
-CostMap::BufferRow::BufferRow(BufferRow& bcm, tbb::split) : cost_map(bcm.cost_map), buff(bcm.buff) { }
+CostMap::BufferRow::BufferRow(BufferRow& bcm, tbb::split) : cost_map(bcm.cost_map), pixel_width(bcm.pixel_width), buffer(bcm.buffer) { }
 
 void CostMap::BufferRow::operator()(const tbb::blocked_range<int>& range)
 {
-
+    
     for (int row = range.begin(); row < range.end(); ++row)
     {
         cv::Mat cm_row = cost_map.row(row);
-        for (int i = 1; i < cost_map.cols-1; ++i)
+        int width = 0;
+        if (cost_map.rows - row <= pixel_width)
+        {
+            width = pixel_width - (cost_map.rows - row);
+        }
+        else continue;
+
+        for (int i = 1; i < cost_map.cols-buffer; ++i)
         {
             uint8_t val = cost_map.at<uint8_t>(row,i);
             uint8_t val_m1 = cost_map.at<uint8_t>(row,i-1);
@@ -188,25 +197,25 @@ void CostMap::BufferRow::operator()(const tbb::blocked_range<int>& range)
 
             if (val == 0 && val_p1 == 255) // backfill
             {
-                if (i <= buff)
+                if (i <= width)
                 {
                     cm_row(cv::Range::all(), cv::Range(0, i)).setTo(255);
                 }
                 else
                 {
-                    cm_row(cv::Range::all(), cv::Range(i-buff, i+1)).setTo(255);
+                    cm_row(cv::Range::all(), cv::Range(i-width, i+1)).setTo(255);
                 }
             }
             else if (val == 255 && val_p1 == 0) // forwardfill
             {
-                if (i > cost_map.cols-buff)
+                if (i > cost_map.cols-width)
                 {
                     cm_row(cv::Range::all(), cv::Range(i, cost_map.cols-1)).setTo(255);
                 }
                 else
                 {
-                    cm_row(cv::Range::all(), cv::Range(i, i+buff)).setTo(255);
-                    i+= buff+1;
+                    cm_row(cv::Range::all(), cv::Range(i, i+width)).setTo(255);
+                    i+= width+1;
                 }
             }
         }
@@ -215,16 +224,17 @@ void CostMap::BufferRow::operator()(const tbb::blocked_range<int>& range)
 
 void CostMap::BufferRow::join(const BufferRow& other) { }
 
-CostMap::BufferCol::BufferCol(cv::Mat& cm, int b) : cost_map(cm), buff(b) { }
+// buffer the column
+CostMap::BufferCol::BufferCol(cv::Mat& cm, int vb, int b) : cost_map(cm), vertical_buffer(vb), buffer(b) { }
 
-CostMap::BufferCol::BufferCol(BufferCol& bcm, tbb::split) : cost_map(bcm.cost_map), buff(bcm.buff) { }
+CostMap::BufferCol::BufferCol(BufferCol& bcm, tbb::split) : cost_map(bcm.cost_map), vertical_buffer(bcm.vertical_buffer), buffer(bcm.buffer) { }
 
 void CostMap::BufferCol::operator()(const tbb::blocked_range<int>& range)
 {
     for (int col = range.begin(); col < range.end(); ++col)
     {
         cv::Mat cm_col = cost_map.col(col);
-        for (int i = 1; i < cost_map.rows-1; ++i)
+        for (int i = 1; i < cost_map.rows-buffer; ++i)
         { 
             uint8_t val = cost_map.at<uint8_t>(i,col);
             uint8_t val_m1 = cost_map.at<uint8_t>(i-1,col);
@@ -232,25 +242,25 @@ void CostMap::BufferCol::operator()(const tbb::blocked_range<int>& range)
 
             if (val == 255 && val_p1 == 0) // upfill
             {
-                if (i <= buff)
+                if (i <= vertical_buffer)
                 {
                     cm_col(cv::Range(0, i), cv::Range::all()).setTo(255);
                 }
                 else
                 {
-                    cm_col(cv::Range(i-buff, i+1), cv::Range::all()).setTo(255);
+                    cm_col(cv::Range(i-vertical_buffer, i+1), cv::Range::all()).setTo(255);
                 }
             }
             else if (val == 255 && val_p1 == 0) // downfill
             {
-                if (i > cost_map.cols-buff)
+                if (i > cost_map.cols-vertical_buffer)
                 {
                     cm_col(cv::Range(i, cost_map.cols-1), cv::Range::all()).setTo(255);
                 }
                 else
                 {
-                    cm_col(cv::Range(i, i+buff), cv::Range::all()).setTo(255);
-                    i+= buff+1;
+                    cm_col(cv::Range(i, i+vertical_buffer), cv::Range::all()).setTo(255);
+                    i+= vertical_buffer+1;
                 }
             }
         }
@@ -266,9 +276,13 @@ void CostMap::CostMapParams::setParams() noexcept
     kernel = params_map_["sizing"]["kernel"].asInt();
     buffer = params_map_["sizing"]["buffer"].asInt();
     threshold = params_map_["sizing"]["threshold"].asInt();
+    edge_buffer = params_map_["sizing"]["edge_buffer"].asInt();
+    vertical_buffer = params_map_["sizing"]["vertical_buffer"].asInt();
+
+    pixel_width = params_map_["robot"]["pixel_width"].asInt() / kernel;
 
     int num_classes = params_map_["sizing"]["num_classes"].asInt();
-
+    
     for (uint8_t i=0; i < num_classes; ++i)
     {
         std::string i_str = std::to_string(i);

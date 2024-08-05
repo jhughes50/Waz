@@ -5,6 +5,8 @@
         "height": 180,
         "kernel": 4,
         "buffer": 8,
+        "edge_buffer": 8,
+        "vertical_buffer": 16,
         "threshold": 20,
         "num_classes": 19
     },

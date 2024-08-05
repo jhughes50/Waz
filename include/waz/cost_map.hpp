@@ -23,6 +23,7 @@
 #include "mode.hpp"
 #include "max.hpp"
 
+
 class CostMap
 {
     public:
@@ -40,9 +41,10 @@ class CostMap
         struct BufferCol
         {
             cv::Mat& cost_map;
-            int buff;
+            int vertical_buffer;
+            int buffer;
 
-            BufferCol(cv::Mat& cm, int buff);
+            BufferCol(cv::Mat& cm, int vb, int b);
             BufferCol(BufferCol& bcm, tbb::split);
 
             void operator()(const tbb::blocked_range<int>& range);
@@ -52,9 +54,10 @@ class CostMap
         struct BufferRow
         {
             cv::Mat& cost_map;
-            int buff;
+            int pixel_width;
+            int buffer;
 
-            BufferRow(cv::Mat& cm, int buffer);
+            BufferRow(cv::Mat& cm, int pw, int b);
             BufferRow(BufferRow& bcm, tbb::split);
 
             void operator()(const tbb::blocked_range<int>& range);
@@ -83,8 +86,9 @@ class CostMap
 
             int width, height;
             int kernel;
-            int buffer;
+            int buffer, edge_buffer, vertical_buffer;
             int threshold;
+            int pixel_width;
             std::map<int, LabelMap> label_map;
 
             void setParams() noexcept;
