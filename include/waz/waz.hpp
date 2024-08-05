@@ -34,6 +34,7 @@ class Waz
         cv::Mat drawPath(cv::Mat img, std::vector<cv::Point> path, bool upscale=true);
     
         cv::Mat getCostMap() const noexcept;
+        cv::Mat getPreFilledCostMap() const noexcept;
         std::vector<cv::Point> getPath() const noexcept;
 
         struct UpscalePath
