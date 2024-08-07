@@ -32,7 +32,8 @@ class Waz
         Waz(std::string path);
         ~Waz();
         
-        std::pair<std::vector<cv::Point>, std::vector<double>> operator()(cv::Mat& img, cv::Point& goal);
+        std::pair<std::vector<cv::Point>, std::vector<double>> operator()(cv::Mat& img, cv::Point& goal); 
+        std::pair<std::vector<cv::Point>, std::vector<double>> operator()(cv::Mat& img);
         cv::Mat drawPath(cv::Mat img, std::vector<cv::Point> path, bool upscale=true);
     
         cv::Mat getCostMap() const noexcept;

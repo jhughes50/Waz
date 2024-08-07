@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <node name="wazros" pkg="waz" type="wazros" output="screen">
+        <remap from="/image" to="/camera/color/image_raw_throttle/compressed"/>
+    </node>
+</launch>

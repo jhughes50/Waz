@@ -24,8 +24,7 @@ void WazRos::imageCallback(const sensor_msgs::CompressedImageConstPtr& msg)
     {
         cv::Mat cv_image = cv::imdecode(cv::Mat(msg->data), cv::IMREAD_COLOR);
 
-        cv::Point goal(80, 45);
-        std::pair<std::vector<cv::Point>, std::vector<double>> path_angle_pair = waz_(cv_image, goal);
+        std::pair<std::vector<cv::Point>, std::vector<double>> path_angle_pair = waz_(cv_image);
     
         std::vector<cv::Point> path = path_angle_pair.first;
         std::vector<double> angles = path_angle_pair.second;
