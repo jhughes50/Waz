@@ -12,6 +12,19 @@ set(Json_INCLUDE_DIRS "/usr/include/jsoncpp")
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+option(BUILD_ROS "Build ROS" ON)
+
+find_package(catkin REQUIRED COMPONENTS
+	roscpp
+	nav_msgs
+	visualization_msgs
+	sensor_msgs
+	std_msgs
+	cv_bridge
+	image_transport
+	tf2_ros
+)
+
 find_package(Torch REQUIRED PATHS "${TORCH_ROOT}")
 find_package(TBB REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -23,6 +36,7 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 include_directories(
     include
+    ${catkin_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
     ${TORCH_INCLUDE_DIRS}
     ${Json_INCLUDE_DIRS}
@@ -50,6 +64,19 @@ add_library(${PROJECT_NAME}
     utils/max.cpp
 )
 
+add_executable(wazros ros/wazros.cpp ros/wazros_node.cpp)
+target_link_libraries(wazros
+    ${PROJECT_NAME}
+    ${TORCH_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    jsoncpp_lib
+    ${glog_LIBRARIES}
+    ${GTEST_LIBRARIES}
+    TBB::tbb
+    pthread
+    Eigen3::Eigen
+    ${catkin_LIBRARIES}
+    )
 
 add_executable(cost-map-test test/cpp/cost_map_test.cpp)
 target_link_libraries(cost-map-test
