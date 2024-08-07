@@ -7,7 +7,7 @@
 * Package: Waz
 */
 
-#include "waz/velocity.hpp"
+#include "waz/api/velocity.hpp"
 
 VelocityController::VelocityController(std::string path) : params_(path+"robot.json")
 {

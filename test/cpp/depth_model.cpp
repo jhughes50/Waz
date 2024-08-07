@@ -7,7 +7,7 @@
 * Package: Waz
 */
 
-#include "waz/depth.hpp"
+#include "waz/apidepth.hpp"
 #include "waz/model.hpp"
 #include "waz/cost_map.hpp"
 

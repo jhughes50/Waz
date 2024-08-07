@@ -6,7 +6,7 @@
 * Package: Waz
 */
 
-#include "waz/astar.hpp"
+#include "waz/api/astar.hpp"
 
 AStarSearch::Node::Node(int r, int c, double g, double h, Node* p) : row(r), col(c), g(g), h(g), f(g+h), parent(p) { }
 

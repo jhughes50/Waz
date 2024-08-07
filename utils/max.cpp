@@ -7,7 +7,7 @@
 * Package: Waz
 */
 
-#include "waz/max.hpp"
+#include "waz/utils/max.hpp"
 
 uint8_t Max::operator()(cv::Mat& mat) noexcept
 {

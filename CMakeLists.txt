@@ -50,30 +50,6 @@ add_library(${PROJECT_NAME}
     utils/max.cpp
 )
 
-add_executable(semantics-test test/cpp/semantics_model.cpp)
-target_link_libraries(semantics-test
-    ${PROJECT_NAME}
-    ${TORCH_LIBRARIES}
-    ${OpenCV_LIBRARIES}
-    jsoncpp_lib
-    ${glog_LIBRARIES}
-    ${GTEST_LIBRARIES}
-    pthread
-    Eigen3::Eigen
-    )
-
-add_executable(depth-test test/cpp/depth_model.cpp)
-target_link_libraries(depth-test
-    ${PROJECT_NAME}
-    ${TORCH_LIBRARIES}
-    ${OpenCV_LIBRARIES}
-    jsoncpp_lib
-    ${glog_LIBRARIES}
-    ${GTEST_LIBRARIES}
-    TBB::tbb
-    pthread
-    Eigen3::Eigen
-    )
 
 add_executable(cost-map-test test/cpp/cost_map_test.cpp)
 target_link_libraries(cost-map-test
@@ -112,14 +88,3 @@ target_link_libraries(preprocess-test
     pthread
     Eigen3::Eigen
     )
-#add_executable(model-test test/models.cpp)
-#target_link_libraries(model-test
-#    ${PROJECT_NAME}
-#    ${TORCH_LIBRARIES}
-#    ${OpenCV_LIBRARIES}
-#    jsoncpp_lib
-#    ${glog_LIBRARIES}
-#    ${GTEST_LIBRARIES}
-#    pthread
-#    )
-#set_property(TARGET model-test PROPERTY CXX_STANDARD 17)

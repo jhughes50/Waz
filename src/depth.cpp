@@ -6,7 +6,7 @@
 * Package: Waz
 */
 
-#include "waz/depth.hpp"
+#include "waz/api/depth.hpp"
 
 DepthManager::DepthManager(std::string params_path, std::string model_id) : NetworkManager(params_path, model_id), params_(params_path)
 {

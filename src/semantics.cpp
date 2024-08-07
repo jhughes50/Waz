@@ -6,7 +6,7 @@
 * Package: Waz
 */
 
-#include "waz/semantics.hpp"
+#include "waz/api/semantics.hpp"
 
 SemanticsManager::SemanticsManager(std::string params_path, std::string model_id) : NetworkManager(params_path, model_id), params_(params_path)
 {

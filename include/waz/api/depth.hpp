@@ -18,10 +18,10 @@
 #include <Eigen/Dense>
 
 #include "network_manager.hpp"
-#include "normalize.hpp"
-#include "resize.hpp"
-#include "params.hpp"
-#include "interpolate.hpp"
+#include "waz/utils/normalize.hpp"
+#include "waz/utils/resize.hpp"
+#include "waz/utils/params.hpp"
+#include "waz/utils/interpolate.hpp"
 
 class DepthManager : protected NetworkManager
 {

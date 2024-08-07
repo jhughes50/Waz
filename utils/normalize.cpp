@@ -7,8 +7,7 @@
 * Package: Waz
 */
 
-#include "waz/normalize.hpp"
-#include <iostream>
+#include "waz/utils/normalize.hpp"
 
 Normalize::Normalize(const float mean[SIZE], const float std[SIZE]) : mean_(mean[0], mean[1], mean[2]), std_(std[0], std[1], std[2]) { }
 

@@ -19,7 +19,7 @@
 #include <json/json.h>
 #include <glog/logging.h>
 
-#include "params.hpp"
+#include "waz/utils/params.hpp"
 
 class NetworkManager
 {

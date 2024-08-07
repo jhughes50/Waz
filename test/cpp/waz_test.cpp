@@ -7,7 +7,7 @@
 */
 
 #include <opencv2/opencv.hpp>
-#include "waz/waz.hpp"
+#include "waz/api/waz.hpp"
 
 int main(int argc, char **argv)
 {
@@ -29,7 +29,7 @@ int main(int argc, char **argv)
         cv::resize(test_img, test_img, dims, cv::INTER_AREA);
     }
 
-    cv::Point goal(80,45);
+    cv::Point goal(160,80);
     std::pair<std::vector<cv::Point>, std::vector<double>> path_angle_pair = waz(test_img, goal);
     
     std::vector<cv::Point> path = path_angle_pair.first;

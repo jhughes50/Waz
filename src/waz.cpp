@@ -6,7 +6,7 @@
 * Package: Waz
 */
 
-#include "waz/waz.hpp"
+#include "waz/api/waz.hpp"
 
 Waz::Waz(std::string path) : depth_(path+"networks.json"), semantics_(path+"networks.json"), cost_map_(path+"cost_map.json"), controller_(path) { }
 

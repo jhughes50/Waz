@@ -16,10 +16,10 @@
 #include <Eigen/Dense>
 
 #include "network_manager.hpp"
-#include "params.hpp"
-#include "resize.hpp"
-#include "normalize.hpp"
-#include "interpolate.hpp"
+#include "waz/utils/params.hpp"
+#include "waz/utils/resize.hpp"
+#include "waz/utils/normalize.hpp"
+#include "waz/utils/interpolate.hpp"
 
 
 class SemanticsManager : protected NetworkManager

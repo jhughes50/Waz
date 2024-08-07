@@ -6,7 +6,7 @@
 * Package: Waz
 */
 
-#include "waz/cost_map.hpp"
+#include "waz/api/cost_map.hpp"
 
 CostMap::CostMap(std::string path) : params_(path)
 {

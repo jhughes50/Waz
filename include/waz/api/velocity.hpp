@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include "params.hpp"
+#include "waz/utils/params.hpp"
 
 
 class VelocityController

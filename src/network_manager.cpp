@@ -4,7 +4,7 @@
 *  Package: Waz
 */
 
-#include "waz/network_manager.hpp"
+#include "waz/api/network_manager.hpp"
 
 
 NetworkManager::NetworkManager(std::string params_path, std::string model_id) : params_(params_path)

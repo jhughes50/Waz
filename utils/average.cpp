@@ -7,7 +7,7 @@
 * Package: Waz
 */
 
-#include <waz/average.hpp>
+#include <waz/utils/average.hpp>
 
 double Average::operator()(cv::Mat& mat) noexcept 
 {

@@ -12,8 +12,8 @@
 #include <glog/logging.h>
 #include <gtest/gtest.h>
 
-#include "waz/network_manager.hpp"
-#include "waz/depth.hpp"
+#include "waz/api/network_manager.hpp"
+#include "waz/api/depth.hpp"
 
 class DepthManagerTest
 {
