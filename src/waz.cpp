@@ -8,14 +8,14 @@
 
 #include "waz/waz.hpp"
 
-Waz::Waz(std::string path) : depth_(path+"networks.json"), semantics_(path+"networks.json"), cost_map_(path+"cost_map.json") { }
+Waz::Waz(std::string path) : depth_(path+"networks.json"), semantics_(path+"networks.json"), cost_map_(path+"cost_map.json"), controller_(path) { }
 
 Waz::~Waz()
 {
 
 }
 
-std::vector<cv::Point> Waz::operator()(cv::Mat& img, cv::Point& goal)
+std::pair<std::vector<cv::Point>, std::vector<double>> Waz::operator()(cv::Mat& img, cv::Point& goal)
 {
     cv::Mat depth = depth_.inference(img);
     cv::Mat semantics = semantics_.inference(img);
@@ -26,8 +26,10 @@ std::vector<cv::Point> Waz::operator()(cv::Mat& img, cv::Point& goal)
     assert(current_cost_map_.at<uchar>(start) != 255);
 
     std::vector<cv::Point> path = astar_.search(current_cost_map_, start, goal);
-
-    return path;
+    std::vector<cv::Point3d> path_cam = controller_.pixelToCamera(path);
+    std::vector<double> angles = controller_.calcAngles(path_cam);
+    
+    return std::make_pair(path, angles);
 }
 
 cv::Mat Waz::drawPath(cv::Mat img, std::vector<cv::Point> path, bool upscale)

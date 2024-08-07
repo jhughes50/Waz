@@ -39,6 +39,7 @@ add_library(${PROJECT_NAME}
     src/cost_map.cpp
     src/waz.cpp
     src/astar.cpp
+    src/velocity.cpp
     utils/label_map.cpp
     utils/params.cpp
     utils/resize.cpp

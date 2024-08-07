@@ -1,0 +1,11 @@
+{
+    "camera":
+    {
+        "hfov": 69,
+        "vfov": 42
+    },
+    "robot":
+    {
+        "max_speed": 2
+    }
+}

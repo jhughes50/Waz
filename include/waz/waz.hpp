@@ -22,6 +22,8 @@
 #include "semantics.hpp"
 #include "cost_map.hpp"
 #include "astar.hpp"
+#include "velocity.hpp"
+
 
 class Waz
 {
@@ -30,7 +32,7 @@ class Waz
         Waz(std::string path);
         ~Waz();
         
-        std::vector<cv::Point> operator()(cv::Mat& img, cv::Point& goal);
+        std::pair<std::vector<cv::Point>, std::vector<double>> operator()(cv::Mat& img, cv::Point& goal);
         cv::Mat drawPath(cv::Mat img, std::vector<cv::Point> path, bool upscale=true);
     
         cv::Mat getCostMap() const noexcept;
@@ -54,7 +56,8 @@ class Waz
         DepthManager depth_;
         SemanticsManager semantics_;
         CostMap cost_map_;
-        AStarSearch astar_;
+        AStarSearch astar_; 
+        VelocityController controller_;
 
         cv::Mat current_cost_map_;
         std::vector<cv::Point> current_path_;
