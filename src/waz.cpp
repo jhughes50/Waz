@@ -32,6 +32,36 @@ std::pair<std::vector<cv::Point>, std::vector<double>> Waz::operator()(cv::Mat& 
     return std::make_pair(path, angles);
 }
 
+
+std::pair<std::vector<cv::Point>, std::vector<double>> Waz::operator()(cv::Mat& img)
+{
+    // There us no goal specified so we go straight
+    cv::Mat depth = depth_.inference(img);
+    cv::Mat semantics = semantics_.inference(img);
+
+    current_cost_map_ = cost_map_.getCostMap(depth, semantics);
+    cv::Point start = cost_map_.getStart();
+    
+    assert(current_cost_map_.at<uchar>(start) != 255);
+
+    int middle = current_cost_map_.cols / 2;
+    cv::Point goal;
+    for (int i=0; i < current_cost_map_.rows-1; ++i)
+    {
+        if (current_cost_map_.at<uint8_t>(i,middle) == 0 && current_cost_map_.at<uint8_t>(i+1,middle) == 0)
+        {
+            goal.x = i;
+            goal.y = middle;
+        }
+    }
+
+    std::vector<cv::Point> path = astar_.search(current_cost_map_, start, goal);
+    std::vector<cv::Point3d> path_cam = controller_.pixelToCamera(path);
+    std::vector<double> angles = controller_.calcAngles(path_cam);
+    
+    return std::make_pair(path, angles);
+}
+
 cv::Mat Waz::drawPath(cv::Mat img, std::vector<cv::Point> path, bool upscale)
 {
     if (upscale)

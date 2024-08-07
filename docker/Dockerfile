@@ -97,7 +97,7 @@ RUN sudo apt-get install -y libgtest-dev \
 
 RUN sudo apt-get install -y gdb
 
-RUN mkdir include/ src/ cmake/ build/ test/ config/ models/ utils/ ros/ .waz/
+RUN mkdir include/ src/ cmake/ build/ test/ config/ models/ utils/ ros/ launch/ .waz/
 
 RUN touch CMakeLists.txt
 RUN /bin/sh -c 'echo ". /opt/ros/noetic/setup.bash" >> ~/.bashrc'

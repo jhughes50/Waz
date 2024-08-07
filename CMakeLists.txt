@@ -34,6 +34,18 @@ find_package(GTest REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
+if (NOT catkin_FOUND)
+    set(BUILD_ROS OFF)
+    message(WARNING "BUILD_ROS set to OFF because catkin not found")
+endif()
+
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES waz
+  CATKIN_DEPENDS nav_msgs visualization_msgs roscpp sensor_msgs std_msgs cv_bridge image_transport tf2_ros
+# DEPENDS system_lib
+)
+
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
