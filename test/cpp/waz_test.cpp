@@ -30,9 +30,17 @@ int main(int argc, char **argv)
     }
 
     cv::Point goal(80,45);
-    std::vector<cv::Point> path = waz(test_img, goal);
-   
+    std::pair<std::vector<cv::Point>, std::vector<double>> path_angle_pair = waz(test_img, goal);
+    
+    std::vector<cv::Point> path = path_angle_pair.first;
+    std::vector<double> angles = path_angle_pair.second;
+
     std::cout << "[TEST] Path length: " << path.size() << std::endl;
+    for (const auto& element : angles) 
+    {
+        std::cout << element << " ";
+    }
+    std::cout << std::endl;
 
     cv::Mat cost_map = waz.getCostMap();
     cv::cvtColor(cost_map, cost_map, cv::COLOR_GRAY2BGR);
