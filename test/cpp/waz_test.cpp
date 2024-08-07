@@ -35,6 +35,7 @@ int main(int argc, char **argv)
     std::vector<cv::Point> path = path_angle_pair.first;
     std::vector<double> angles = path_angle_pair.second;
 
+
     std::cout << "[TEST] Path length: " << path.size() << std::endl;
     for (const auto& element : angles) 
     {
@@ -48,7 +49,7 @@ int main(int argc, char **argv)
     cv::Mat cmd = waz.drawPath(cost_map, path, false);
 
     cv::imshow("cost map path", cmd);
-
+    cv::imshow("prefilled", waz.getPreFilledCostMap()); 
     cv::Mat drawn = waz.drawPath(test_img, path);
     
     cv::imshow("path", drawn);

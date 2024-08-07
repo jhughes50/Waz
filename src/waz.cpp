@@ -74,3 +74,8 @@ void Waz::UpscalePath::operator()(const tbb::blocked_range<int>& r)
 }
 
 void Waz::UpscalePath::join(const UpscalePath& other) { }
+
+cv::Mat Waz::getPreFilledCostMap() const noexcept
+{
+    return cost_map_.getPreFilled();
+}

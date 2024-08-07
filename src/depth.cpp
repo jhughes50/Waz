@@ -38,8 +38,8 @@ cv::Mat DepthManager::sobel(cv::Mat& img)
     cv::Mat grad_x, grad_y, grad;
 
     // Am I doing a harsh type conversion here?
-    cv::Sobel(img, grad_x, CV_64F, 1, 0, 7);
-    cv::Sobel(img, grad_y, CV_64F, 0, 1, 7);
+    cv::Sobel(img, grad_x, CV_64F, 1, 0, params_.filter_size);
+    cv::Sobel(img, grad_y, CV_64F, 0, 1, params_.filter_size);
 
     cv::magnitude(grad_x, grad_y, grad);
     cv::normalize(grad, grad, 0, 255, cv::NORM_MINMAX, CV_8U);
@@ -112,4 +112,5 @@ void DepthManager::DepthParams::setParams() noexcept
 
     input_height = params_map_["depth"]["input_height"].asInt();
     input_width = params_map_["depth"]["input_width"].asInt();
+    filter_size = params_map_["depth"]["filter"].asInt();
 }

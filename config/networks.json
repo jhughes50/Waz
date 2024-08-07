@@ -9,6 +9,7 @@
         "std_r": 0.229,
         "std_g": 0.224,
         "std_b": 0.225,
+        "filter": 31,
         "input_height": 518,
         "input_width": 518
     },
